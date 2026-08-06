@@ -28,7 +28,11 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Health Check Route
+// Health Check & Root Routes for Render Health Checker
+app.get('/', (req: Request, res: Response) => {
+  res.send('Glorious Apostolic Church India Council API Service is Live!');
+});
+
 app.get('/api/health', (req: Request, res: Response) => {
   res.json({
     status: 'ONLINE',
