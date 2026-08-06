@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://gacic-sunday-attendance.onrender.com/api' : '/api');
+const API_BASE = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://gacic-sunday-attendance.onrender.com' : '/api');
 
 export function getAuthToken(): string | null {
   return localStorage.getItem('gacic_admin_token');
