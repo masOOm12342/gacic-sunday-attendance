@@ -10,8 +10,8 @@ export async function downloadWithAuth(
   filename: string
 ): Promise<void> {
   const token = getAuthToken();
-  const apiBase = import.meta.env.VITE_API_BASE_URL || '';
-  const fullUrl = url.startsWith('/api') && apiBase ? `${apiBase}${url.replace('/api', '')}` : url;
+  const apiBase = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://gacic-sunday-attendance.onrender.com/api' : '/api');
+  const fullUrl = url.startsWith('/api') ? `${apiBase}${url.replace('/api', '')}` : url;
 
   const response = await fetch(fullUrl, {
     method: 'GET',

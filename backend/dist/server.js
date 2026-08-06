@@ -20,7 +20,12 @@ const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5000;
 // Security & Middleware
 app.use((0, helmet_1.default)({ crossOriginResourcePolicy: false }));
-app.use((0, cors_1.default)({ origin: '*', credentials: true }));
+app.use((0, cors_1.default)({
+    origin: '*', // Allows access from mobile browsers on same WiFi network
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 app.use(express_1.default.json({ limit: '10mb' }));
 app.use(express_1.default.urlencoded({ extended: true, limit: '10mb' }));
 // Health Check Route
