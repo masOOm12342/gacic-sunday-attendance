@@ -4,7 +4,7 @@
   "description": "Glorious Apostolic Church India Council - Sunday Attendance Backend API",
   "main": "dist/server.js",
   "scripts": {
-    "build": "tsc",
+    "build": "npm rebuild sqlite3 && tsc",
     "start": "node dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts"
   },
