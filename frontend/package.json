@@ -16,9 +16,7 @@
     "lucide-react": "^0.379.0",
     "qrcode.react": "^3.1.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
-  "devDependencies": {
+    "react-dom": "^18.3.1",
     "@types/canvas-confetti": "^1.6.4",
     "@types/node": "^20.12.12",
     "@types/qrcode.react": "^1.0.5",
