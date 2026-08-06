@@ -4,7 +4,7 @@
   "description": "Glorious Apostolic Church India Council - Sunday Attendance Backend API",
   "main": "dist/server.js",
   "scripts": {
-    "build": "npm rebuild sqlite3 && tsc",
+    "build": "npx tsc",
     "start": "node dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts"
   },
@@ -19,9 +19,7 @@
     "pdfkit": "^0.15.0",
     "pdfkit-table": "^0.1.99",
     "sqlite3": "^5.1.7",
-    "zod": "^3.23.8"
-  },
-  "devDependencies": {
+    "zod": "^3.23.8",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
