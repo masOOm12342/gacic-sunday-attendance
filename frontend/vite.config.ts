@@ -11,7 +11,6 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true, // Expose on all network interfaces (0.0.0.0) for mobile access
-    https: true, // Required for camera access on mobile browsers
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
