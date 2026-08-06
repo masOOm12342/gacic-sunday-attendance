@@ -1,16 +1,12 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import basicSsl from '@vitejs/plugin-basic-ssl';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-    basicSsl(), // Generates a self-signed cert so camera works on mobile over HTTPS
-  ],
+  plugins: [react()],
   server: {
     port: 3000,
-    host: true, // Expose on all network interfaces (0.0.0.0) for mobile access
+    host: true,
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
