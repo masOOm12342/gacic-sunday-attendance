@@ -136,56 +136,7 @@ async function initDatabase() {
         // Always update hash to ensure glorious@340 is valid
         await execute(`UPDATE admins SET password_hash = ?, role = 'SUPER_ADMIN', status = 'ACTIVE' WHERE LOWER(email) = LOWER(?)`, [defaultPasswordHash, superAdminEmail]);
     }
-    // Seed sample members if DB is fresh
-    const memberCount = await queryOne(`SELECT COUNT(*) as count FROM members`);
-    const countNum = parseInt(String(memberCount?.count || 0), 10);
-    if (countNum === 0) {
-        const now = (0, datetime_1.getISTDateTimeString)();
-        await execute(`INSERT INTO members (reg_id, full_name, mobile_number, email, address, place_city, gender, dob, notes, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
-            'REG-2026-00001',
-            'Pastor Samuel Joseph',
-            '9876543210',
-            'samuel@gloriouschurch.org',
-            '12 Grace Avenue, Bandra West',
-            'Mumbai',
-            'Male',
-            '1982-05-15',
-            'Senior Pastor',
-            now,
-            now
-        ]);
-        await execute(`INSERT INTO members (reg_id, full_name, mobile_number, email, address, place_city, gender, dob, notes, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
-            'REG-2026-00002',
-            'Grace Joseph',
-            '9876543210',
-            'grace@gloriouschurch.org',
-            '12 Grace Avenue, Bandra West',
-            'Mumbai',
-            'Female',
-            '1985-08-20',
-            'Worship Ministry',
-            now,
-            now
-        ]);
-        await execute(`INSERT INTO members (reg_id, full_name, mobile_number, email, address, place_city, gender, dob, notes, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
-            'REG-2026-00003',
-            'David Thomas',
-            '9820011223',
-            'david.thomas@gmail.com',
-            '45 Churchgate Road',
-            'Mumbai',
-            'Male',
-            '1995-11-03',
-            'Youth Leader',
-            now,
-            now
-        ]);
-        console.log('[DB Seed] Inserted sample church members');
-    }
-    console.log('[DB] Neon PostgreSQL Database Initialized & Seeded Successfully.');
+    console.log('[DB] Neon PostgreSQL Database Initialized Successfully.');
 }
 /**
  * Generate sequential Registration ID: REG-2026-00001, REG-2026-00002...
