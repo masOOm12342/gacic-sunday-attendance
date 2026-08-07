@@ -11,13 +11,13 @@ exports.generateNextRegistrationId = generateNextRegistrationId;
 const pg_1 = require("pg");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const datetime_1 = require("../utils/datetime");
-const connectionString = process.env.DATABASE_URL ||
-    'postgresql://neondb_owner:npg_GImp9yeL5gNY@ep-rough-glitter-azse9usz.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=verify-full';
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+    console.warn('[DB Warning] DATABASE_URL environment variable is not defined.');
+}
 const pool = new pg_1.Pool({
-    connectionString,
-    ssl: {
-        rejectUnauthorized: false
-    }
+    connectionString: connectionString || undefined,
+    ssl: connectionString ? { rejectUnauthorized: false } : false
 });
 function convertPlaceholders(sql) {
     let index = 1;
@@ -45,6 +45,10 @@ async function execute(sql, params = []) {
     return { lastID, changes: res.rowCount || 0 };
 }
 async function initDatabase() {
+    if (!connectionString) {
+        console.error('[DB Error] Cannot initialize database: DATABASE_URL environment variable is missing.');
+        return;
+    }
     // 1. Members Table
     await execute(`
     CREATE TABLE IF NOT EXISTS members (
