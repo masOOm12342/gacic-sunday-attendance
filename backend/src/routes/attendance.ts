@@ -118,7 +118,8 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
       params.push(searchPattern, searchPattern, searchPattern, searchPattern);
     }
 
-    sql += ` ORDER BY a.id DESC`;
+    // Sort by Registration ID sequence (REG-2026-00001, REG-2026-00002...)
+    sql += ` ORDER BY m.reg_id ASC, m.id ASC`;
 
     const records = await query<AttendanceRecord>(sql, params);
     return res.json({ success: true, count: records.length, attendance: records });

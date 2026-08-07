@@ -94,7 +94,8 @@ router.get('/', auth_1.authenticateToken, async (req, res) => {
             sql += ` AND (a.reg_id LIKE ? OR m.full_name LIKE ? OR m.mobile_number LIKE ? OR m.place_city LIKE ?)`;
             params.push(searchPattern, searchPattern, searchPattern, searchPattern);
         }
-        sql += ` ORDER BY a.id DESC`;
+        // Sort by Registration ID sequence (REG-2026-00001, REG-2026-00002...)
+        sql += ` ORDER BY m.reg_id ASC, m.id ASC`;
         const records = await (0, db_1.query)(sql, params);
         return res.json({ success: true, count: records.length, attendance: records });
     }

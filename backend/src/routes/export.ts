@@ -11,7 +11,8 @@ const router = Router();
 // GET /api/export/members/excel
 router.get('/members/excel', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const members = await query<Member>(`SELECT * FROM members ORDER BY id ASC`);
+    // Ordered by Registration ID Sequence (REG-2026-00001, REG-2026-00002...)
+    const members = await query<Member>(`SELECT * FROM members ORDER BY reg_id ASC, id ASC`);
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Members List');
@@ -73,7 +74,8 @@ router.get('/members/excel', authenticateToken, async (req: AuthenticatedRequest
 // GET /api/export/members/pdf
 router.get('/members/pdf', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const members = await query<Member>(`SELECT * FROM members ORDER BY id ASC`);
+    // Ordered by Registration ID Sequence (REG-2026-00001, REG-2026-00002...)
+    const members = await query<Member>(`SELECT * FROM members ORDER BY reg_id ASC, id ASC`);
 
     const doc = new PDFDocument({ margin: 30, size: 'A4' });
 
@@ -141,7 +143,9 @@ router.get('/attendance/excel', authenticateToken, async (req: AuthenticatedRequ
       sql += ` WHERE a.service_date = ?`;
       params.push(String(date));
     }
-    sql += ` ORDER BY a.id DESC`;
+
+    // Sort by Registration ID sequence (REG-2026-00001, REG-2026-00002...) regardless of scan order!
+    sql += ` ORDER BY m.reg_id ASC, m.id ASC`;
 
     const records = await query<any>(sql, params);
 
@@ -212,7 +216,9 @@ router.get('/attendance/pdf', authenticateToken, async (req: AuthenticatedReques
       sql += ` WHERE a.service_date = ?`;
       params.push(String(date));
     }
-    sql += ` ORDER BY a.id DESC`;
+
+    // Sort by Registration ID sequence (REG-2026-00001, REG-2026-00002...) regardless of scan order!
+    sql += ` ORDER BY m.reg_id ASC, m.id ASC`;
 
     const records = await query<any>(sql, params);
 

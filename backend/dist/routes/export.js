@@ -13,7 +13,8 @@ const router = (0, express_1.Router)();
 // GET /api/export/members/excel
 router.get('/members/excel', auth_1.authenticateToken, async (req, res) => {
     try {
-        const members = await (0, db_1.query)(`SELECT * FROM members ORDER BY id ASC`);
+        // Ordered by Registration ID Sequence (REG-2026-00001, REG-2026-00002...)
+        const members = await (0, db_1.query)(`SELECT * FROM members ORDER BY reg_id ASC, id ASC`);
         const workbook = new exceljs_1.default.Workbook();
         const worksheet = workbook.addWorksheet('Members List');
         // Title Row
@@ -68,7 +69,8 @@ router.get('/members/excel', auth_1.authenticateToken, async (req, res) => {
 // GET /api/export/members/pdf
 router.get('/members/pdf', auth_1.authenticateToken, async (req, res) => {
     try {
-        const members = await (0, db_1.query)(`SELECT * FROM members ORDER BY id ASC`);
+        // Ordered by Registration ID Sequence (REG-2026-00001, REG-2026-00002...)
+        const members = await (0, db_1.query)(`SELECT * FROM members ORDER BY reg_id ASC, id ASC`);
         const doc = new pdfkit_1.default({ margin: 30, size: 'A4' });
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename=GACIC_Members_${(0, datetime_1.getISTDateString)()}.pdf`);
@@ -124,7 +126,8 @@ router.get('/attendance/excel', auth_1.authenticateToken, async (req, res) => {
             sql += ` WHERE a.service_date = ?`;
             params.push(String(date));
         }
-        sql += ` ORDER BY a.id DESC`;
+        // Sort by Registration ID sequence (REG-2026-00001, REG-2026-00002...) regardless of scan order!
+        sql += ` ORDER BY m.reg_id ASC, m.id ASC`;
         const records = await (0, db_1.query)(sql, params);
         const workbook = new exceljs_1.default.Workbook();
         const worksheet = workbook.addWorksheet('Sunday Attendance');
@@ -186,7 +189,8 @@ router.get('/attendance/pdf', auth_1.authenticateToken, async (req, res) => {
             sql += ` WHERE a.service_date = ?`;
             params.push(String(date));
         }
-        sql += ` ORDER BY a.id DESC`;
+        // Sort by Registration ID sequence (REG-2026-00001, REG-2026-00002...) regardless of scan order!
+        sql += ` ORDER BY m.reg_id ASC, m.id ASC`;
         const records = await (0, db_1.query)(sql, params);
         const doc = new pdfkit_1.default({ margin: 30, size: 'A4' });
         res.setHeader('Content-Type', 'application/pdf');
