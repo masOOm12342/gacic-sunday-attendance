@@ -1,126 +1,135 @@
-import sqlite3 from 'sqlite3';
-import path from 'path';
-import fs from 'fs';
+import { Pool } from 'pg';
 import bcrypt from 'bcryptjs';
 import { getISTDateTimeString } from '../utils/datetime';
 
-const dbDir = path.resolve(__dirname, '../../database');
-if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
+const connectionString =
+  process.env.DATABASE_URL ||
+  'postgresql://neondb_owner:npg_GImp9yeL5gNY@ep-rough-glitter-azse9usz.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=verify-full';
+
+const pool = new Pool({
+  connectionString,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
+
+function convertPlaceholders(sql: string): string {
+  let index = 1;
+  return sql.replace(/\?/g, () => `$${index++}`);
 }
 
-const dbPath = path.join(dbDir, 'church_app.db');
-const db = new sqlite3.Database(dbPath);
-
-export function query<T = any>(sql: string, params: any[] = []): Promise<T[]> {
-  return new Promise((resolve, reject) => {
-    db.all(sql, params, (err, rows) => {
-      if (err) return reject(err);
-      resolve(rows as T[]);
-    });
-  });
+export async function query<T = any>(sql: string, params: any[] = []): Promise<T[]> {
+  const formattedSql = convertPlaceholders(sql);
+  const res = await pool.query(formattedSql, params);
+  return res.rows as T[];
 }
 
-export function queryOne<T = any>(sql: string, params: any[] = []): Promise<T | null> {
-  return new Promise((resolve, reject) => {
-    db.get(sql, params, (err, row) => {
-      if (err) return reject(err);
-      resolve((row as T) || null);
-    });
-  });
+export async function queryOne<T = any>(sql: string, params: any[] = []): Promise<T | null> {
+  const formattedSql = convertPlaceholders(sql);
+  const res = await pool.query(formattedSql, params);
+  return (res.rows[0] as T) || null;
 }
 
-export function execute(sql: string, params: any[] = []): Promise<{ lastID: number; changes: number }> {
-  return new Promise((resolve, reject) => {
-    db.run(sql, params, function (err) {
-      if (err) return reject(err);
-      resolve({ lastID: this.lastID, changes: this.changes });
-    });
-  });
+export async function execute(
+  sql: string,
+  params: any[] = []
+): Promise<{ lastID: number; changes: number }> {
+  let formattedSql = convertPlaceholders(sql);
+
+  if (
+    /^\s*INSERT\s+INTO/i.test(formattedSql) &&
+    !/RETURNING/i.test(formattedSql) &&
+    !/system_settings/i.test(formattedSql)
+  ) {
+    formattedSql += ' RETURNING id';
+  }
+
+  const res = await pool.query(formattedSql, params);
+  const lastID = res.rows[0]?.id ? Number(res.rows[0].id) : 0;
+  return { lastID, changes: res.rowCount || 0 };
 }
 
 export async function initDatabase() {
   // 1. Members Table
   await execute(`
     CREATE TABLE IF NOT EXISTS members (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      reg_id TEXT UNIQUE NOT NULL,
-      full_name TEXT NOT NULL,
-      mobile_number TEXT NOT NULL,
-      email TEXT,
+      id SERIAL PRIMARY KEY,
+      reg_id VARCHAR(30) UNIQUE NOT NULL,
+      full_name VARCHAR(150) NOT NULL,
+      mobile_number VARCHAR(20) NOT NULL,
+      email VARCHAR(120),
       address TEXT NOT NULL,
-      place_city TEXT NOT NULL,
-      gender TEXT,
-      dob TEXT,
+      place_city VARCHAR(100) NOT NULL,
+      gender VARCHAR(30),
+      dob VARCHAR(30),
       notes TEXT,
-      created_at TEXT NOT NULL,
-      updated_at TEXT NOT NULL,
-      UNIQUE(full_name, mobile_number)
+      created_at VARCHAR(50) NOT NULL,
+      updated_at VARCHAR(50) NOT NULL,
+      CONSTRAINT idx_name_mobile_unique UNIQUE(full_name, mobile_number)
     );
   `);
 
   // 2. Sunday Attendance Table
   await execute(`
     CREATE TABLE IF NOT EXISTS attendance (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      member_id INTEGER NOT NULL,
-      reg_id TEXT NOT NULL,
-      service_date TEXT NOT NULL,
-      check_in_time TEXT NOT NULL,
-      status TEXT DEFAULT 'Present',
-      scanned_by TEXT DEFAULT 'Admin Scanner',
-      created_at TEXT NOT NULL,
-      FOREIGN KEY(member_id) REFERENCES members(id),
-      UNIQUE(member_id, service_date)
+      id SERIAL PRIMARY KEY,
+      member_id INTEGER NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+      reg_id VARCHAR(30) NOT NULL,
+      service_date VARCHAR(20) NOT NULL,
+      check_in_time VARCHAR(20) NOT NULL,
+      status VARCHAR(20) DEFAULT 'Present',
+      scanned_by VARCHAR(100) DEFAULT 'Admin Scanner',
+      created_at VARCHAR(50) NOT NULL,
+      CONSTRAINT idx_member_service_date UNIQUE(member_id, service_date)
     );
   `);
 
   // 3. Admins Table
   await execute(`
     CREATE TABLE IF NOT EXISTS admins (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      full_name TEXT NOT NULL,
-      email TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL,
-      role TEXT NOT NULL DEFAULT 'ADMIN',
-      status TEXT NOT NULL DEFAULT 'ACTIVE',
-      created_at TEXT NOT NULL,
-      last_login TEXT
+      id SERIAL PRIMARY KEY,
+      full_name VARCHAR(150) NOT NULL,
+      email VARCHAR(120) UNIQUE NOT NULL,
+      password_hash VARCHAR(255) NOT NULL,
+      role VARCHAR(20) NOT NULL DEFAULT 'ADMIN',
+      status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+      created_at VARCHAR(50) NOT NULL,
+      last_login VARCHAR(50)
     );
   `);
 
   // 4. Admin Access Requests Table
   await execute(`
     CREATE TABLE IF NOT EXISTS admin_requests (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      full_name TEXT NOT NULL,
-      email TEXT UNIQUE NOT NULL,
-      mobile_number TEXT NOT NULL,
+      id SERIAL PRIMARY KEY,
+      full_name VARCHAR(150) NOT NULL,
+      email VARCHAR(120) UNIQUE NOT NULL,
+      mobile_number VARCHAR(20) NOT NULL,
       reason TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'PENDING',
-      created_at TEXT NOT NULL,
-      reviewed_at TEXT
+      status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+      created_at VARCHAR(50) NOT NULL,
+      reviewed_at VARCHAR(50)
     );
   `);
 
   // 5. System Settings Table
   await execute(`
     CREATE TABLE IF NOT EXISTS system_settings (
-      key_name TEXT PRIMARY KEY,
+      key_name VARCHAR(100) PRIMARY KEY,
       key_value TEXT NOT NULL,
-      updated_at TEXT NOT NULL
+      updated_at VARCHAR(50) NOT NULL
     );
   `);
 
   // Seed Default System Settings
   await execute(
-    `INSERT OR IGNORE INTO system_settings (key_name, key_value, updated_at) VALUES (?, ?, ?)`,
+    `INSERT INTO system_settings (key_name, key_value, updated_at) VALUES (?, ?, ?) ON CONFLICT (key_name) DO NOTHING`,
     ['organization_name', 'Glorious Apostolic Church India Council', getISTDateTimeString()]
   );
 
   // Seed Default Permanent Super Admin: gacic_admin@gmail.com / glorious@340
   const superAdminEmail = 'gacic_admin@gmail.com';
-  const existingSuperAdmin = await queryOne(`SELECT * FROM admins WHERE email = ?`, [superAdminEmail]);
+  const existingSuperAdmin = await queryOne(`SELECT * FROM admins WHERE LOWER(email) = LOWER(?)`, [superAdminEmail]);
 
   const defaultPasswordHash = bcrypt.hashSync('glorious@340', 10);
 
@@ -140,14 +149,16 @@ export async function initDatabase() {
   } else {
     // Always update hash to ensure glorious@340 is valid
     await execute(
-      `UPDATE admins SET password_hash = ?, role = 'SUPER_ADMIN', status = 'ACTIVE' WHERE email = ?`,
+      `UPDATE admins SET password_hash = ?, role = 'SUPER_ADMIN', status = 'ACTIVE' WHERE LOWER(email) = LOWER(?)`,
       [defaultPasswordHash, superAdminEmail]
     );
   }
 
   // Seed sample members if DB is fresh
-  const memberCount = await queryOne<{ count: number }>(`SELECT COUNT(*) as count FROM members`);
-  if (memberCount && memberCount.count === 0) {
+  const memberCount = await queryOne<{ count: string | number }>(`SELECT COUNT(*) as count FROM members`);
+  const countNum = parseInt(String(memberCount?.count || 0), 10);
+
+  if (countNum === 0) {
     const now = getISTDateTimeString();
     await execute(
       `INSERT INTO members (reg_id, full_name, mobile_number, email, address, place_city, gender, dob, notes, created_at, updated_at)
@@ -172,7 +183,7 @@ export async function initDatabase() {
       [
         'REG-2026-00002',
         'Grace Joseph',
-        '9876543210', // Same mobile number as Pastor Samuel, different name -> allowed!
+        '9876543210',
         'grace@gloriouschurch.org',
         '12 Grace Avenue, Bandra West',
         'Mumbai',
@@ -203,7 +214,7 @@ export async function initDatabase() {
     console.log('[DB Seed] Inserted sample church members');
   }
 
-  console.log('[DB] SQLite Database Initialized & Seeded Successfully.');
+  console.log('[DB] Neon PostgreSQL Database Initialized & Seeded Successfully.');
 }
 
 /**
@@ -227,4 +238,4 @@ export async function generateNextRegistrationId(): Promise<string> {
   return `REG-${currentYear}-${paddedSeq}`;
 }
 
-export default db;
+export default pool;

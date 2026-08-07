@@ -10,15 +10,15 @@ router.get('/stats', authenticateToken, async (req: AuthenticatedRequest, res: R
     const todayDate = getISTDateString(); // YYYY-MM-DD (IST)
 
     // 1. Total Registered Members
-    const totalMembersRes = await queryOne<{ count: number }>(`SELECT COUNT(*) as count FROM members`);
-    const totalMembers = totalMembersRes?.count || 0;
+    const totalMembersRes = await queryOne<{ count: string | number }>(`SELECT COUNT(*) as count FROM members`);
+    const totalMembers = parseInt(String(totalMembersRes?.count || 0), 10);
 
     // 2. Today's Check-ins
-    const todayCheckInsRes = await queryOne<{ count: number }>(
+    const todayCheckInsRes = await queryOne<{ count: string | number }>(
       `SELECT COUNT(*) as count FROM attendance WHERE service_date = ?`,
       [todayDate]
     );
-    const todayCheckIns = todayCheckInsRes?.count || 0;
+    const todayCheckIns = parseInt(String(todayCheckInsRes?.count || 0), 10);
 
     // 3. Members Not Checked In Today
     const notCheckedIn = Math.max(0, totalMembers - todayCheckIns);
@@ -42,12 +42,17 @@ router.get('/stats', authenticateToken, async (req: AuthenticatedRequest, res: R
     );
 
     // 7. Recent 5 Attendance Days Trend
-    const attendanceTrend = await query(
+    const attendanceTrendRaw = await query(
       `SELECT service_date, COUNT(*) as count
        FROM attendance
        GROUP BY service_date
        ORDER BY service_date DESC LIMIT 7`
     );
+
+    const attendanceTrend = attendanceTrendRaw.map(row => ({
+      service_date: row.service_date,
+      count: parseInt(String(row.count || 0), 10)
+    }));
 
     return res.json({
       success: true,

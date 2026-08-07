@@ -15,10 +15,10 @@ router.get('/info', auth_1.authenticateToken, auth_1.requireSuperAdmin, async (r
         return res.json({
             success: true,
             tables: [
-                { name: 'members', records: memberCount?.count || 0 },
-                { name: 'attendance', records: attendanceCount?.count || 0 },
-                { name: 'admins', records: adminCount?.count || 0 },
-                { name: 'admin_requests', records: requestCount?.count || 0 },
+                { name: 'members', records: parseInt(String(memberCount?.count || 0), 10) },
+                { name: 'attendance', records: parseInt(String(attendanceCount?.count || 0), 10) },
+                { name: 'admins', records: parseInt(String(adminCount?.count || 0), 10) },
+                { name: 'admin_requests', records: parseInt(String(requestCount?.count || 0), 10) },
                 { name: 'system_settings', records: settings.length }
             ],
             settings
