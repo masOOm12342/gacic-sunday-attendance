@@ -80,11 +80,20 @@ router.get('/public/lookup', async (req: Request, res: Response) => {
     }
 
     const searchTerm = q.trim();
-    // Match either reg_id (REG-YYYY-NNNNN) or a 10-digit mobile number
-    const member = await queryOne<Member>(
-      `SELECT reg_id, full_name, mobile_number, place_city, gender FROM members WHERE reg_id = ? OR mobile_number = ?`,
-      [searchTerm, searchTerm]
-    );
+    const isNumeric = /^\d+$/.test(searchTerm);
+    let member: Member | null = null;
+
+    if (isNumeric) {
+      member = await queryOne<Member>(
+        `SELECT reg_id, full_name, mobile_number, place_city, gender FROM members WHERE id = ? OR reg_id = ? OR mobile_number = ?`,
+        [parseInt(searchTerm, 10), searchTerm, searchTerm]
+      );
+    } else {
+      member = await queryOne<Member>(
+        `SELECT reg_id, full_name, mobile_number, place_city, gender FROM members WHERE reg_id = ? OR mobile_number = ?`,
+        [searchTerm, searchTerm]
+      );
+    }
 
     if (!member) {
       return res.status(404).json({ success: false, message: `No registered member found for "${searchTerm}". Please verify your Registration ID or Mobile Number.` });
@@ -134,12 +143,27 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
 // Admin GET /api/members/:id
 router.get('/:id', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const member = await queryOne<Member>(`SELECT * FROM members WHERE id = ? OR reg_id = ?`, [req.params.id, req.params.id]);
+    const param = req.params.id ? req.params.id.trim() : '';
+    let member: Member | null = null;
+
+    if (/^\d+$/.test(param)) {
+      member = await queryOne<Member>(
+        `SELECT * FROM members WHERE id = ? OR reg_id = ? OR mobile_number = ?`,
+        [parseInt(param, 10), param, param]
+      );
+    } else {
+      member = await queryOne<Member>(
+        `SELECT * FROM members WHERE reg_id = ? OR mobile_number = ?`,
+        [param, param]
+      );
+    }
+
     if (!member) {
       return res.status(404).json({ success: false, message: 'Member not found.' });
     }
     return res.json({ success: true, member });
   } catch (error: any) {
+    console.error('Error retrieving member by id/reg_id:', error);
     return res.status(500).json({ success: false, message: 'Error retrieving member details.' });
   }
 });

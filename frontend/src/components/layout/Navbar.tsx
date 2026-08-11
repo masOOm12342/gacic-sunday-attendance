@@ -27,11 +27,18 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setActiveTab('home')}
             className="flex items-center gap-3 cursor-pointer group"
           >
-            {/* Dedicated Logo Placeholder Box */}
+            {/* Dedicated Logo Box */}
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-900 via-purple-900 to-amber-600 p-[2px] shadow-glow-gold group-hover:scale-105 transition-transform duration-300">
               <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center relative overflow-hidden border border-amber-500/30">
-                <Church className="w-6 h-6 text-amber-400 group-hover:rotate-6 transition-transform" />
-                <span className="absolute -bottom-1 text-[8px] font-bold text-amber-300 tracking-tighter opacity-80 uppercase">LOGO</span>
+                <img
+                  src="/logo.png"
+                  alt="GACIC Logo"
+                  className="w-full h-full object-cover rounded-[9px]"
+                  onError={(e) => {
+                    // Fallback to icon if logo image fails to load
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
               </div>
             </div>
 
