@@ -1,4 +1,4 @@
-import { execute, queryOne } from './index';
+import pool, { execute, queryOne } from './index';
 import { getISTDateTimeString } from '../utils/datetime';
 
 export interface SeedMember {
@@ -195,43 +195,66 @@ export async function seedInitialMembers() {
 /**
  * One-time fix: delete duplicate Nikam entries (REG-2026-00063 & 00064 which are
  * duplicates of REG-2026-00022 & 00023) and renumber REG-2026-00065..00139 → 00063..00137.
+ *
+ * Uses a transaction with ALTER TABLE to drop the unique constraint, do the bulk
+ * renumber in one UPDATE, then restore the constraint — the proper PostgreSQL way.
  */
 async function fixDuplicateNikamSequence() {
   try {
-    // Check if old-style duplicate Nikam entries still exist by their Aadhaar
-    const oldNikam = await queryOne(
-      `SELECT id FROM members WHERE reg_id = ? AND adhaar_number = ?`,
-      ['REG-2026-00063', '412141722412']
+    // Detect if old duplicate Nikam entry still exists at REG-2026-00063
+    const isDuplicate = await queryOne(
+      `SELECT id FROM members WHERE reg_id = ? AND (full_name ILIKE ? OR adhaar_number = ?)`,
+      ['REG-2026-00063', '%Nikam%', '412141722412']
     );
-    if (!oldNikam) {
-      // Already fixed or not seeded yet — nothing to do
+
+    if (!isDuplicate) {
+      // Already fixed — nothing to do
       return;
     }
 
-    console.log('[DB Seed] Fixing duplicate Nikam entries and renumbering sequence from 65→63 to 139→137...');
+    console.log('[DB Migration] Duplicate Nikam entries detected. Running sequence fix...');
 
-    // Delete the 2 duplicates
-    await execute(
-      `DELETE FROM members WHERE reg_id IN (?, ?)`,
-      ['REG-2026-00063', 'REG-2026-00064']
-    );
-    console.log('[DB Seed] Deleted duplicate REG-2026-00063 and REG-2026-00064 (Nikam family).');
+    // Use pool directly for a full transaction with constraint management
+    const client = await pool.connect();
 
-    // Renumber 00065→00063, 00066→00064, ..., 00139→00137
-    // Use temporary IDs first to avoid unique constraint conflicts during rename
-    for (let i = 65; i <= 139; i++) {
-      const oldId = `REG-2026-${String(i).padStart(5, '0')}`;
-      const tmpId = `REG-TMP-${String(i).padStart(5, '0')}`;
-      await execute(`UPDATE members SET reg_id = ? WHERE reg_id = ?`, [tmpId, oldId]);
+    try {
+      await client.query('BEGIN');
+
+      // Step 1: Drop the unique constraint on reg_id temporarily
+      await client.query(`ALTER TABLE members DROP CONSTRAINT IF EXISTS members_reg_id_key`);
+      // Also try alternative constraint name patterns
+      await client.query(`ALTER TABLE members DROP CONSTRAINT IF EXISTS members_reg_id_unique`);
+      await client.query(`ALTER TABLE members DROP CONSTRAINT IF EXISTS unique_reg_id`);
+
+      // Step 2: Delete the 2 duplicate Nikam entries
+      const delResult = await client.query(
+        `DELETE FROM members WHERE reg_id IN ($1, $2) RETURNING reg_id, full_name`,
+        ['REG-2026-00063', 'REG-2026-00064']
+      );
+      console.log(`[DB Migration] Deleted ${delResult.rowCount} duplicate entries:`,
+        delResult.rows.map((r: any) => `${r.reg_id}: ${r.full_name}`).join(', '));
+
+      // Step 3: Renumber 00065..00139 → 00063..00137 in one UPDATE
+      const updateResult = await client.query(
+        `UPDATE members
+         SET reg_id = CONCAT('REG-2026-', LPAD((SUBSTRING(reg_id FROM 10)::INTEGER - 2)::TEXT, 5, '0'))
+         WHERE reg_id >= $1 AND reg_id <= $2`,
+        ['REG-2026-00065', 'REG-2026-00139']
+      );
+      console.log(`[DB Migration] Renumbered ${updateResult.rowCount} members.`);
+
+      // Step 4: Restore the unique constraint
+      await client.query(`ALTER TABLE members ADD CONSTRAINT members_reg_id_key UNIQUE (reg_id)`);
+
+      await client.query('COMMIT');
+      console.log('[DB Migration] Done. Sequence is now REG-2026-00001 to REG-2026-00137.');
+    } catch (innerErr: any) {
+      await client.query('ROLLBACK');
+      console.error('[DB Migration] Transaction rolled back:', innerErr.message);
+    } finally {
+      client.release();
     }
-    for (let i = 65; i <= 139; i++) {
-      const tmpId = `REG-TMP-${String(i).padStart(5, '0')}`;
-      const newId = `REG-2026-${String(i - 2).padStart(5, '0')}`;
-      await execute(`UPDATE members SET reg_id = ? WHERE reg_id = ?`, [newId, tmpId]);
-    }
-
-    console.log('[DB Seed] Renumbering complete. Last member is now REG-2026-00137.');
   } catch (e: any) {
-    console.warn('[DB Seed] fixDuplicateNikamSequence skipped or errored:', e.message);
+    console.warn('[DB Migration] fixDuplicateNikamSequence error:', e.message);
   }
 }
