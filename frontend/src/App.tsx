@@ -3,6 +3,7 @@ import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { Hero } from './components/public/Hero';
 import { RegistrationForm } from './components/public/RegistrationForm';
+import { VisitorRegistrationForm } from './components/public/VisitorRegistrationForm';
 import { QRDownloadSearch } from './components/public/QRDownloadSearch';
 import { QRSuccessModal } from './components/public/QRSuccessModal';
 import { AdminLoginModal } from './components/admin/AdminLoginModal';
@@ -13,13 +14,14 @@ import { MemberManagement } from './components/admin/MemberManagement';
 import { AttendanceLog } from './components/admin/AttendanceLog';
 import { AdminRequestsManager } from './components/admin/AdminRequestsManager';
 import { DatabaseManager } from './components/admin/DatabaseManager';
+import { VisitorManagement } from './components/admin/VisitorManagement';
 import { AdminUser, Member } from './types';
 import { apiRequest, getAuthToken, removeAuthToken } from './utils/api';
-import { LayoutDashboard, QrCode, Users, CalendarCheck, ShieldAlert, Database } from 'lucide-react';
+import { LayoutDashboard, QrCode, Users, CalendarCheck, ShieldAlert, Database, Heart } from 'lucide-react';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<'home' | 'register' | 'download_qr' | 'scanner' | 'admin_dashboard'>('home');
-  const [adminSubTab, setAdminSubTab] = useState<'overview' | 'scanner' | 'members' | 'attendance' | 'requests' | 'database'>('overview');
+  const [activeTab, setActiveTab] = useState<'home' | 'register' | 'visitor' | 'download_qr' | 'scanner' | 'admin_dashboard'>('home');
+  const [adminSubTab, setAdminSubTab] = useState<'overview' | 'scanner' | 'members' | 'visitors' | 'attendance' | 'requests' | 'database'>('overview');
 
   const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -106,6 +108,11 @@ export function App() {
           />
         )}
 
+        {/* PUBLIC: New Visitor Registration Page */}
+        {activeTab === 'visitor' && (
+          <VisitorRegistrationForm />
+        )}
+
         {/* PUBLIC: QR Search & Download Page */}
         {activeTab === 'download_qr' && (
           <QRDownloadSearch
@@ -157,6 +164,18 @@ export function App() {
               </button>
 
               <button
+                onClick={() => setAdminSubTab('visitors')}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 ${
+                  adminSubTab === 'visitors'
+                    ? 'bg-emerald-500 text-white shadow-lg'
+                    : 'text-emerald-300 hover:text-white hover:bg-slate-800'
+                }`}
+              >
+                <Heart className="w-4 h-4" />
+                <span>Visitor Directory</span>
+              </button>
+
+              <button
                 onClick={() => setAdminSubTab('attendance')}
                 className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 ${
                   adminSubTab === 'attendance'
@@ -201,7 +220,11 @@ export function App() {
             {adminSubTab === 'overview' && (
               <DashboardOverview
                 onNavigateTab={(tab) => {
-                  setAdminSubTab(tab);
+                  if (tab === 'visitors') {
+                    setAdminSubTab('visitors');
+                  } else {
+                    setAdminSubTab(tab as any);
+                  }
                 }}
               />
             )}
@@ -212,6 +235,10 @@ export function App() {
 
             {adminSubTab === 'members' && (
               <MemberManagement />
+            )}
+
+            {adminSubTab === 'visitors' && (
+              <VisitorManagement />
             )}
 
             {adminSubTab === 'attendance' && (

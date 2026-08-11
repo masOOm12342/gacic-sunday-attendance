@@ -67,10 +67,36 @@ export async function initDatabase() {
       place_city VARCHAR(100) NOT NULL,
       gender VARCHAR(30),
       dob VARCHAR(30),
+      adhaar_number VARCHAR(30),
       notes TEXT,
       created_at VARCHAR(50) NOT NULL,
       updated_at VARCHAR(50) NOT NULL,
       CONSTRAINT idx_name_mobile_unique UNIQUE(full_name, mobile_number)
+    );
+  `);
+
+  // Ensure adhaar_number column exists if table was created previously
+  try {
+    await execute(`ALTER TABLE members ADD COLUMN IF NOT EXISTS adhaar_number VARCHAR(30);`);
+  } catch (e) {
+    // Ignore if column exists
+  }
+
+  // 1b. Visitors Table
+  await execute(`
+    CREATE TABLE IF NOT EXISTS visitors (
+      id SERIAL PRIMARY KEY,
+      visitor_id VARCHAR(30) UNIQUE NOT NULL,
+      full_name VARCHAR(150) NOT NULL,
+      mobile_number VARCHAR(20) NOT NULL,
+      address TEXT NOT NULL,
+      place_city VARCHAR(100) NOT NULL,
+      invited_by VARCHAR(150),
+      notes TEXT,
+      status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+      transferred_member_reg_id VARCHAR(30),
+      created_at VARCHAR(50) NOT NULL,
+      updated_at VARCHAR(50) NOT NULL
     );
   `);
 
@@ -181,6 +207,27 @@ export async function generateNextRegistrationId(): Promise<string> {
 
   const paddedSeq = String(nextSeq).padStart(5, '0');
   return `REG-${currentYear}-${paddedSeq}`;
+}
+
+/**
+ * Generate sequential Visitor ID: VIS-2026-00001, VIS-2026-00002...
+ */
+export async function generateNextVisitorId(): Promise<string> {
+  const currentYear = new Date().getFullYear();
+  const lastVisitor = await queryOne<{ visitor_id: string }>(
+    `SELECT visitor_id FROM visitors ORDER BY id DESC LIMIT 1`
+  );
+
+  let nextSeq = 1;
+  if (lastVisitor && lastVisitor.visitor_id) {
+    const match = lastVisitor.visitor_id.match(/VIS-\d+-(\d+)/);
+    if (match && match[1]) {
+      nextSeq = parseInt(match[1], 10) + 1;
+    }
+  }
+
+  const paddedSeq = String(nextSeq).padStart(5, '0');
+  return `VIS-${currentYear}-${paddedSeq}`;
 }
 
 export default pool;

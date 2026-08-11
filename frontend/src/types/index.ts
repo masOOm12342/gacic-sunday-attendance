@@ -8,7 +8,23 @@ export interface Member {
   place_city: string;
   gender?: string | null;
   dob?: string | null;
+  adhaar_number?: string | null;
   notes?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Visitor {
+  id: number;
+  visitor_id: string;
+  full_name: string;
+  mobile_number: string;
+  address: string;
+  place_city: string;
+  invited_by?: string | null;
+  notes?: string | null;
+  status: 'ACTIVE' | 'TRANSFERRED';
+  transferred_member_reg_id?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -56,6 +72,7 @@ export interface DashboardStats {
   isTodaySunday: boolean;
   activeServiceDate: string;
   recentRegistrations: Member[];
+  recentVisitors: Visitor[];
   recentCheckIns: AttendanceRecord[];
   notCheckedInMembers: Member[];
   attendanceTrend: { service_date: string; count: number }[];

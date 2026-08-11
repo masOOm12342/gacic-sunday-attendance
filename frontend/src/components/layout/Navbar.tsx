@@ -1,10 +1,10 @@
 import React from 'react';
-import { Church, QrCode, UserPlus, Shield, Sparkles, LogOut, CheckCircle2, UserCheck } from 'lucide-react';
+import { Church, QrCode, UserPlus, Shield, Sparkles, LogOut, Heart } from 'lucide-react';
 import { AdminUser } from '../../types';
 
 interface NavbarProps {
-  activeTab: 'home' | 'register' | 'download_qr' | 'scanner' | 'admin_dashboard';
-  setActiveTab: (tab: 'home' | 'register' | 'download_qr' | 'scanner' | 'admin_dashboard') => void;
+  activeTab: 'home' | 'register' | 'visitor' | 'download_qr' | 'scanner' | 'admin_dashboard';
+  setActiveTab: (tab: 'home' | 'register' | 'visitor' | 'download_qr' | 'scanner' | 'admin_dashboard') => void;
   adminUser: AdminUser | null;
   onAdminLoginClick: () => void;
   onLogout: () => void;
@@ -85,6 +85,18 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
 
             <button
+              onClick={() => setActiveTab('visitor')}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 ${
+                activeTab === 'visitor'
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-700 text-white shadow-md'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+              }`}
+            >
+              <Heart className="w-4 h-4 text-rose-400" />
+              New Visitor
+            </button>
+
+            <button
               onClick={() => setActiveTab('download_qr')}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 ${
                 activeTab === 'download_qr'
@@ -153,6 +165,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <UserPlus className="w-4 h-4" />
             <span>Register</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('visitor')}
+            className={`flex flex-col items-center gap-1 ${activeTab === 'visitor' ? 'text-emerald-400' : 'text-slate-400'}`}
+          >
+            <Heart className="w-4 h-4" />
+            <span>Visitor</span>
           </button>
           <button
             onClick={() => setActiveTab('download_qr')}

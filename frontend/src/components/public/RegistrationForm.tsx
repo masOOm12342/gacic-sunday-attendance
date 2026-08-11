@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Phone, MapPin, Mail, Calendar, FileText, AlertTriangle, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react';
+import { User, Phone, MapPin, Mail, Calendar, FileText, AlertTriangle, Sparkles, CheckCircle2, ArrowRight, CreditCard } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { apiRequest } from '../../utils/api';
 import { Member } from '../../types';
@@ -17,6 +17,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess })
     place_city: '',
     gender: 'Male',
     dob: '',
+    adhaar_number: '',
     notes: '',
   });
 
@@ -230,8 +231,8 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess })
 
           </div>
 
-          {/* Row 3: Gender & DOB */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {/* Row 3: Gender, DOB & Aadhaar Number */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             
             {/* Gender */}
             <div>
@@ -266,6 +267,24 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess })
                 Date of Birth (Optional)
               </label>
               <Calendar className="absolute right-3.5 top-9 w-4 h-4 text-slate-400 pointer-events-none" />
+            </div>
+
+            {/* Aadhaar Number */}
+            <div className="floating-label-group pt-6">
+              <input
+                type="text"
+                id="adhaar_number"
+                name="adhaar_number"
+                value={formData.adhaar_number}
+                onChange={handleChange}
+                placeholder=" "
+                maxLength={14}
+                className="floating-input"
+              />
+              <label htmlFor="adhaar_number" className="floating-label">
+                Aadhaar Number (Optional)
+              </label>
+              <CreditCard className="absolute right-3.5 top-9 w-4 h-4 text-slate-400 pointer-events-none" />
             </div>
 
           </div>

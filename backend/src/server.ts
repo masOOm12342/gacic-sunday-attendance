@@ -6,6 +6,7 @@ import path from 'path';
 import { initDatabase } from './db';
 import authRoutes from './routes/auth';
 import memberRoutes from './routes/members';
+import visitorRoutes from './routes/visitors';
 import attendanceRoutes from './routes/attendance';
 import dashboardRoutes from './routes/dashboard';
 import adminRequestRoutes from './routes/adminRequests';
@@ -45,6 +46,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/members', memberRoutes);
+app.use('/api/visitors', visitorRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/admin/requests', adminRequestRoutes);

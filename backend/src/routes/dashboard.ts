@@ -2,7 +2,7 @@ import { Router, Response } from 'express';
 import { query, queryOne } from '../db';
 import { authenticateToken, AuthenticatedRequest } from '../middleware/auth';
 import { getISTDateString } from '../utils/datetime';
-import { Member } from '../types';
+import { Member, Visitor } from '../types';
 
 const router = Router();
 
@@ -69,9 +69,14 @@ router.get('/stats', authenticateToken, async (req: AuthenticatedRequest, res: R
       ? Number(((todayCheckIns / totalMembers) * 100).toFixed(1))
       : 0;
 
-    // 5. Recent 5 Registrations
+    // 5. Recent 5 Member Registrations
     const recentRegistrations = await query<Member>(
       `SELECT id, reg_id, full_name, mobile_number, place_city, created_at FROM members ORDER BY id DESC LIMIT 5`
+    );
+
+    // 5b. Recent 5 Visitors (for dashboard Column 1 - New Visitors today)
+    const recentVisitors = await query<Visitor>(
+      `SELECT * FROM visitors ORDER BY id DESC LIMIT 5`
     );
 
     // 6. Recent 5 Check-ins (for activeServiceDate or overall)
@@ -127,6 +132,7 @@ router.get('/stats', authenticateToken, async (req: AuthenticatedRequest, res: R
         isTodaySunday,
         activeServiceDate,
         recentRegistrations,
+        recentVisitors,
         recentCheckIns: displayCheckIns,
         notCheckedInMembers,
         attendanceTrend: attendanceTrend.reverse()

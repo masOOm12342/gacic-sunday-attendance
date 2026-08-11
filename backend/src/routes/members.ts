@@ -9,7 +9,7 @@ const router = Router();
 // Public POST /api/members/register (Public Registration)
 router.post('/register', async (req: Request, res: Response) => {
   try {
-    const { full_name, mobile_number, email, address, place_city, gender, dob, notes } = req.body;
+    const { full_name, mobile_number, email, address, place_city, gender, dob, adhaar_number, notes } = req.body;
 
     if (!full_name || !mobile_number || !address || !place_city) {
       return res.status(400).json({
@@ -41,8 +41,8 @@ router.post('/register', async (req: Request, res: Response) => {
     const now = getISTDateTimeString();
 
     const result = await execute(
-      `INSERT INTO members (reg_id, full_name, mobile_number, email, address, place_city, gender, dob, notes, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO members (reg_id, full_name, mobile_number, email, address, place_city, gender, dob, adhaar_number, notes, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         reg_id,
         cleanName,
@@ -52,6 +52,7 @@ router.post('/register', async (req: Request, res: Response) => {
         place_city.trim(),
         gender || null,
         dob || null,
+        adhaar_number ? adhaar_number.trim() : null,
         notes ? notes.trim() : null,
         now,
         now
@@ -171,7 +172,7 @@ router.get('/:id', authenticateToken, async (req: AuthenticatedRequest, res: Res
 // Admin POST /api/members (Manual Add)
 router.post('/', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { full_name, mobile_number, email, address, place_city, gender, dob, notes } = req.body;
+    const { full_name, mobile_number, email, address, place_city, gender, dob, adhaar_number, notes } = req.body;
 
     if (!full_name || !mobile_number || !address || !place_city) {
       return res.status(400).json({ success: false, message: 'Full Name, Mobile Number, Address, and Place/City are required.' });
@@ -197,8 +198,8 @@ router.post('/', authenticateToken, async (req: AuthenticatedRequest, res: Respo
     const now = getISTDateTimeString();
 
     const result = await execute(
-      `INSERT INTO members (reg_id, full_name, mobile_number, email, address, place_city, gender, dob, notes, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO members (reg_id, full_name, mobile_number, email, address, place_city, gender, dob, adhaar_number, notes, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         reg_id,
         cleanName,
@@ -208,6 +209,7 @@ router.post('/', authenticateToken, async (req: AuthenticatedRequest, res: Respo
         place_city.trim(),
         gender || null,
         dob || null,
+        adhaar_number ? adhaar_number.trim() : null,
         notes ? notes.trim() : null,
         now,
         now
@@ -225,7 +227,7 @@ router.post('/', authenticateToken, async (req: AuthenticatedRequest, res: Respo
 router.put('/:id', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const memberId = req.params.id;
-    const { full_name, mobile_number, email, address, place_city, gender, dob, notes } = req.body;
+    const { full_name, mobile_number, email, address, place_city, gender, dob, adhaar_number, notes } = req.body;
 
     const existing = await queryOne<Member>(`SELECT * FROM members WHERE id = ?`, [memberId]);
     if (!existing) {
@@ -242,6 +244,7 @@ router.put('/:id', authenticateToken, async (req: AuthenticatedRequest, res: Res
         place_city = ?,
         gender = ?,
         dob = ?,
+        adhaar_number = ?,
         notes = ?,
         updated_at = ?
        WHERE id = ?`,
@@ -253,6 +256,7 @@ router.put('/:id', authenticateToken, async (req: AuthenticatedRequest, res: Res
         place_city ? place_city.trim() : existing.place_city,
         gender !== undefined ? gender : existing.gender,
         dob !== undefined ? dob : existing.dob,
+        adhaar_number !== undefined ? (adhaar_number ? adhaar_number.trim() : null) : existing.adhaar_number,
         notes !== undefined ? notes : existing.notes,
         now,
         memberId
