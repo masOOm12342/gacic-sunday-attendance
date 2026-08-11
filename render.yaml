@@ -1,0 +1,26 @@
+services:
+  # 1. Backend Express Node.js API Service (Free Tier)
+  - type: web
+    name: gacic-attendance-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+
+  # 2. Frontend React Vite Static Site (Free Tier)
+  - type: static
+    name: gacic-attendance-frontend
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
