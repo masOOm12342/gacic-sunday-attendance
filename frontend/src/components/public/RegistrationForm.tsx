@@ -13,10 +13,9 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess })
     full_name: '',
     mobile_number: '',
     address: '',
-    place_city: '',
-    adhaar_number: '',
-    gender: 'Male',
     dob: '',
+    gender: 'Male',
+    adhaar_number: '',
   });
 
   const [loading, setLoading] = useState(false);
@@ -34,9 +33,9 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess })
     setErrorMessage(null);
     setDuplicateInfo(null);
 
-    // Front-end validation
-    if (!formData.full_name.trim() || !formData.mobile_number.trim() || !formData.address.trim() || !formData.place_city.trim() || !formData.adhaar_number.trim()) {
-      setErrorMessage('Please fill in all required fields: Full Name, Mobile Number, Address, Place/City, and Aadhaar Number.');
+    // Front-end validation: Name, Mobile, Address, DOB are REQUIRED
+    if (!formData.full_name.trim() || !formData.mobile_number.trim() || !formData.address.trim() || !formData.dob.trim()) {
+      setErrorMessage('Please fill in all required fields: Full Name, Mobile Number, Address, and Date of Birth.');
       return;
     }
 
@@ -51,7 +50,10 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess })
       const res = await apiRequest<{ success: boolean; message: string; member?: Member; isDuplicate?: boolean; existingMember?: Member }>(
         '/members/register',
         'POST',
-        formData
+        {
+          ...formData,
+          place_city: formData.address // fallback place_city to address
+        }
       );
 
       if (res.success && res.member) {
@@ -66,10 +68,9 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess })
           full_name: '',
           mobile_number: '',
           address: '',
-          place_city: '',
-          adhaar_number: '',
-          gender: 'Male',
           dob: '',
+          gender: 'Male',
+          adhaar_number: '',
         });
         setErrorMessage(null);
         setDuplicateInfo(null);
@@ -177,7 +178,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess })
 
           </div>
 
-          {/* Row 2: Address & Place/City */}
+          {/* Row 2: Address & DOB (Required) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             
             {/* Address */}
@@ -198,47 +199,28 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess })
               <MapPin className="absolute right-3.5 top-4 w-4 h-4 text-slate-400 pointer-events-none" />
             </div>
 
-            {/* Place / City Came From */}
+            {/* Date of Birth (Required) */}
             <div className="floating-label-group">
               <input
-                type="text"
-                id="place_city"
-                name="place_city"
-                value={formData.place_city}
+                type="date"
+                id="dob"
+                name="dob"
+                value={formData.dob}
                 onChange={handleChange}
                 placeholder=" "
                 required
                 className="floating-input"
               />
-              <label htmlFor="place_city" className="floating-label">
-                Place / City Came From <span className="text-rose-500">*</span>
+              <label htmlFor="dob" className="floating-label">
+                Date of Birth <span className="text-rose-500">*</span>
               </label>
-              <MapPin className="absolute right-3.5 top-4 w-4 h-4 text-slate-400 pointer-events-none" />
+              <Calendar className="absolute right-3.5 top-4 w-4 h-4 text-slate-400 pointer-events-none" />
             </div>
 
           </div>
 
-          {/* Row 3: Aadhaar Number (REQUIRED), Gender & DOB */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-
-            {/* Aadhaar Number (Required) */}
-            <div className="floating-label-group">
-              <input
-                type="text"
-                id="adhaar_number"
-                name="adhaar_number"
-                value={formData.adhaar_number}
-                onChange={handleChange}
-                placeholder=" "
-                maxLength={14}
-                required
-                className="floating-input"
-              />
-              <label htmlFor="adhaar_number" className="floating-label">
-                Aadhaar Number <span className="text-rose-500">*</span>
-              </label>
-              <CreditCard className="absolute right-3.5 top-4 w-4 h-4 text-slate-400 pointer-events-none" />
-            </div>
+          {/* Row 3: Gender & Aadhaar Number (Optional) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             
             {/* Gender */}
             <div>
@@ -255,21 +237,22 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess })
               </select>
             </div>
 
-            {/* Date of Birth */}
+            {/* Aadhaar Number (Optional) */}
             <div className="floating-label-group">
               <input
-                type="date"
-                id="dob"
-                name="dob"
-                value={formData.dob}
+                type="text"
+                id="adhaar_number"
+                name="adhaar_number"
+                value={formData.adhaar_number}
                 onChange={handleChange}
                 placeholder=" "
+                maxLength={14}
                 className="floating-input"
               />
-              <label htmlFor="dob" className="floating-label">
-                Date of Birth (Optional)
+              <label htmlFor="adhaar_number" className="floating-label">
+                Aadhaar Number (Optional)
               </label>
-              <Calendar className="absolute right-3.5 top-4 w-4 h-4 text-slate-400 pointer-events-none" />
+              <CreditCard className="absolute right-3.5 top-4 w-4 h-4 text-slate-400 pointer-events-none" />
             </div>
 
           </div>

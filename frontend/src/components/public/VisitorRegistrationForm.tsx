@@ -15,10 +15,9 @@ export const VisitorRegistrationForm: React.FC<VisitorRegistrationFormProps> = (
     full_name: '',
     mobile_number: '',
     address: '',
-    place_city: '',
-    adhaar_number: '',
     dob: '',
     invited_by: '',
+    adhaar_number: '',
   });
 
   const [loading, setLoading]           = useState(false);
@@ -33,8 +32,8 @@ export const VisitorRegistrationForm: React.FC<VisitorRegistrationFormProps> = (
     e.preventDefault();
     setErrorMessage(null);
 
-    if (!formData.full_name.trim() || !formData.mobile_number.trim() || !formData.address.trim() || !formData.place_city.trim() || !formData.adhaar_number.trim()) {
-      setErrorMessage('Please fill in all required fields: Full Name, Mobile Number, Address, Place/City, and Aadhaar Number.');
+    if (!formData.full_name.trim() || !formData.mobile_number.trim() || !formData.address.trim() || !formData.dob.trim()) {
+      setErrorMessage('Please fill in all required fields: Full Name, Mobile Number, Address, and Date of Birth.');
       return;
     }
 
@@ -48,14 +47,17 @@ export const VisitorRegistrationForm: React.FC<VisitorRegistrationFormProps> = (
       const res = await apiRequest<{ success: boolean; message: string; visitor?: Visitor; isDuplicate?: boolean; existingVisitor?: Visitor }>(
         '/visitors/register',
         'POST',
-        formData
+        {
+          ...formData,
+          place_city: formData.address // fallback place_city to address
+        }
       );
 
       if (res.success && res.visitor) {
         confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, colors: ['#f59e0b', '#7c3aed', '#10b981'] });
         onSuccess?.(res.visitor);
         // Reset form automatically
-        setFormData({ full_name: '', mobile_number: '', address: '', place_city: '', adhaar_number: '', dob: '', invited_by: '' });
+        setFormData({ full_name: '', mobile_number: '', address: '', dob: '', invited_by: '', adhaar_number: '' });
         setErrorMessage(null);
       } else if (res.isDuplicate) {
         setErrorMessage(res.message || 'You are already registered as a visitor.');
@@ -128,7 +130,7 @@ export const VisitorRegistrationForm: React.FC<VisitorRegistrationFormProps> = (
 
           </div>
 
-          {/* Row 2: Address & Place/City */}
+          {/* Row 2: Address & DOB (Required) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
             <div className="floating-label-group">
@@ -140,40 +142,7 @@ export const VisitorRegistrationForm: React.FC<VisitorRegistrationFormProps> = (
               <MapPin className="absolute right-3.5 top-4 w-4 h-4 text-slate-400 pointer-events-none" />
             </div>
 
-            <div className="floating-label-group">
-              <input type="text" id="visitor_place_city" name="place_city" value={formData.place_city}
-                onChange={handleChange} placeholder=" " required className="floating-input" />
-              <label htmlFor="visitor_place_city" className="floating-label">
-                Place / City Came From <span className="text-rose-500">*</span>
-              </label>
-              <MapPin className="absolute right-3.5 top-4 w-4 h-4 text-slate-400 pointer-events-none" />
-            </div>
-
-          </div>
-
-          {/* Row 3: Aadhaar Number (REQUIRED), DOB & Invited By */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-
-            {/* Aadhaar Number (Required) */}
-            <div className="floating-label-group">
-              <input
-                type="text"
-                id="visitor_adhaar"
-                name="adhaar_number"
-                value={formData.adhaar_number}
-                onChange={handleChange}
-                placeholder=" "
-                maxLength={14}
-                required
-                className="floating-input"
-              />
-              <label htmlFor="visitor_adhaar" className="floating-label">
-                Aadhaar Number <span className="text-rose-500">*</span>
-              </label>
-              <CreditCard className="absolute right-3.5 top-4 w-4 h-4 text-slate-400 pointer-events-none" />
-            </div>
-
-            {/* Date of Birth */}
+            {/* Date of Birth (Required) */}
             <div className="floating-label-group">
               <input
                 type="date"
@@ -182,15 +151,21 @@ export const VisitorRegistrationForm: React.FC<VisitorRegistrationFormProps> = (
                 value={formData.dob}
                 onChange={handleChange}
                 placeholder=" "
+                required
                 className="floating-input"
               />
               <label htmlFor="visitor_dob" className="floating-label">
-                Date of Birth (Optional)
+                Date of Birth <span className="text-rose-500">*</span>
               </label>
               <Calendar className="absolute right-3.5 top-4 w-4 h-4 text-slate-400 pointer-events-none" />
             </div>
 
-            {/* Invited By */}
+          </div>
+
+          {/* Row 3: Referred By & Aadhaar Number (Optional) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+            {/* Referred By */}
             <div className="floating-label-group">
               <input
                 type="text"
@@ -202,9 +177,27 @@ export const VisitorRegistrationForm: React.FC<VisitorRegistrationFormProps> = (
                 className="floating-input"
               />
               <label htmlFor="visitor_invited_by" className="floating-label">
-                Invited By (Optional)
+                Referred By (Optional)
               </label>
               <UserCheck className="absolute right-3.5 top-4 w-4 h-4 text-slate-400 pointer-events-none" />
+            </div>
+
+            {/* Aadhaar Number (Optional) */}
+            <div className="floating-label-group">
+              <input
+                type="text"
+                id="visitor_adhaar"
+                name="adhaar_number"
+                value={formData.adhaar_number}
+                onChange={handleChange}
+                placeholder=" "
+                maxLength={14}
+                className="floating-input"
+              />
+              <label htmlFor="visitor_adhaar" className="floating-label">
+                Aadhaar Number (Optional)
+              </label>
+              <CreditCard className="absolute right-3.5 top-4 w-4 h-4 text-slate-400 pointer-events-none" />
             </div>
 
           </div>

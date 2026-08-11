@@ -187,11 +187,26 @@ export async function initDatabase() {
     );
     console.log(`[DB Seed] Created default Super Admin: ${superAdminEmail}`);
   } else {
-    // Always update hash to ensure glorious@340 is valid
     await execute(
       `UPDATE admins SET password_hash = ?, role = 'SUPER_ADMIN', status = 'ACTIVE' WHERE LOWER(email) = LOWER(?)`,
       [defaultPasswordHash, superAdminEmail]
     );
+  }
+
+  // 6. Make place_city optional in members and visitors tables
+  try {
+    await execute(`ALTER TABLE members ALTER COLUMN place_city DROP NOT NULL;`);
+  } catch (e) {}
+  try {
+    await execute(`ALTER TABLE visitors ALTER COLUMN place_city DROP NOT NULL;`);
+  } catch (e) {}
+
+  // 7. Seed Initial 139 Members Data if not present
+  try {
+    const { seedInitialMembers } = await import('./seedData');
+    await seedInitialMembers();
+  } catch (seedErr) {
+    console.error('[DB Seed Error]', seedErr);
   }
 
   console.log('[DB] Neon PostgreSQL Database Initialized Successfully.');

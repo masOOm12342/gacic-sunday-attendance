@@ -156,10 +156,10 @@ export const QRSuccessModal: React.FC<QRSuccessModalProps> = ({ member, onClose 
 
         ctx.fillStyle = '#94A3B8';
         ctx.font = '12px Arial';
-        ctx.fillText(`Place:`, CARD_W / 2 - 90, detailY + 40);
+        ctx.fillText(`Address:`, CARD_W / 2 - 90, detailY + 40);
         ctx.fillStyle = '#E2E8F0';
         ctx.font = 'bold 12px Arial';
-        ctx.fillText(member.place_city || '—', CARD_W / 2 + 10, detailY + 40);
+        ctx.fillText(member.address || member.place_city || '—', CARD_W / 2 + 10, detailY + 40);
 
         // ── Bottom gold separator
         ctx.strokeStyle = '#D4AF37';
@@ -276,7 +276,7 @@ export const QRSuccessModal: React.FC<QRSuccessModalProps> = ({ member, onClose 
             <div className="text-xs text-slate-400 space-y-1">
               <p>Mobile: <span className="text-slate-200 font-medium">{member.mobile_number}</span></p>
               <p>Aadhaar No.: <span className="text-amber-400 font-medium font-mono">{adhaarText}</span></p>
-              <p>Place: <span className="text-slate-200 font-medium">{member.place_city}</span></p>
+              <p>Address: <span className="text-slate-200 font-medium">{member.address || member.place_city}</span></p>
               <p className="text-[10px] text-amber-400/80 pt-2 uppercase tracking-widest font-semibold">
                 Scan every Sunday for instant check-in
               </p>
