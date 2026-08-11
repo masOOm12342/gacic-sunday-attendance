@@ -91,6 +91,8 @@ export async function initDatabase() {
       mobile_number VARCHAR(20) NOT NULL,
       address TEXT NOT NULL,
       place_city VARCHAR(100) NOT NULL,
+      adhaar_number VARCHAR(30),
+      dob VARCHAR(30),
       invited_by VARCHAR(150),
       notes TEXT,
       status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
@@ -99,6 +101,13 @@ export async function initDatabase() {
       updated_at VARCHAR(50) NOT NULL
     );
   `);
+
+  try {
+    await execute(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS adhaar_number VARCHAR(30);`);
+    await execute(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS dob VARCHAR(30);`);
+  } catch (e) {
+    // Ignore if columns exist
+  }
 
   // 2. Sunday Attendance Table
   await execute(`

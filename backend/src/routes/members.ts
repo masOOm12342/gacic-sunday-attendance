@@ -11,10 +11,10 @@ router.post('/register', async (req: Request, res: Response) => {
   try {
     const { full_name, mobile_number, email, address, place_city, gender, dob, adhaar_number, notes } = req.body;
 
-    if (!full_name || !mobile_number || !address || !place_city) {
+    if (!full_name || !mobile_number || !address || !place_city || !adhaar_number) {
       return res.status(400).json({
         success: false,
-        message: 'Full Name, Mobile Number, Address, and Place/City are required.'
+        message: 'Full Name, Mobile Number, Address, Place/City, and Aadhaar Number are required.'
       });
     }
 

@@ -12,12 +12,12 @@ const router = Router();
 // ──────────────────────────────────────────────────────────────
 router.post('/register', async (req: Request, res: Response) => {
   try {
-    const { full_name, mobile_number, address, place_city, invited_by, notes } = req.body;
+    const { full_name, mobile_number, address, place_city, adhaar_number, dob, invited_by } = req.body;
 
-    if (!full_name || !mobile_number || !address || !place_city) {
+    if (!full_name || !mobile_number || !address || !place_city || !adhaar_number) {
       return res.status(400).json({
         success: false,
-        message: 'Full Name, Mobile Number, Address, and Place/City are required.'
+        message: 'Full Name, Mobile Number, Address, Place/City, and Aadhaar Number are required.'
       });
     }
 
@@ -43,16 +43,17 @@ router.post('/register', async (req: Request, res: Response) => {
     const now = getISTDateTimeString();
 
     const result = await execute(
-      `INSERT INTO visitors (visitor_id, full_name, mobile_number, address, place_city, invited_by, notes, status, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 'ACTIVE', ?, ?)`,
+      `INSERT INTO visitors (visitor_id, full_name, mobile_number, address, place_city, adhaar_number, dob, invited_by, status, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVE', ?, ?)`,
       [
         visitor_id,
         cleanName,
         cleanMobile,
         address.trim(),
         place_city.trim(),
+        adhaar_number.trim(),
+        dob ? dob.trim() : null,
         invited_by ? invited_by.trim() : null,
-        notes    ? notes.trim()    : null,
         now,
         now
       ]
@@ -89,8 +90,8 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
 
     if (search) {
       const pat = `%${String(search).trim()}%`;
-      sql += ` AND (visitor_id LIKE ? OR full_name LIKE ? OR mobile_number LIKE ? OR place_city LIKE ?)`;
-      params.push(pat, pat, pat, pat);
+      sql += ` AND (visitor_id LIKE ? OR full_name LIKE ? OR mobile_number LIKE ? OR place_city LIKE ? OR adhaar_number LIKE ?)`;
+      params.push(pat, pat, pat, pat, pat);
     }
 
     sql += ` ORDER BY id DESC`;
@@ -109,8 +110,6 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
 // ──────────────────────────────────────────────────────────────
 router.get('/recent-today', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    // IST date portion in created_at (format: "DD/MM/YYYY HH:mm:ss")
-    // We filter by today's date string embedded in created_at
     const visitors = await query<Visitor>(
       `SELECT * FROM visitors ORDER BY id DESC LIMIT 5`
     );
@@ -166,13 +165,13 @@ router.post('/:id/transfer', authenticateToken, async (req: AuthenticatedRequest
         reg_id,
         visitor.full_name,
         visitor.mobile_number,
-        null,                // email — visitor form doesn't collect it
+        null,                     // email
         visitor.address,
         visitor.place_city,
-        null,                // gender
-        null,                // dob
-        null,                // adhaar_number
-        visitor.notes || null,
+        null,                     // gender
+        visitor.dob || null,      // dob
+        visitor.adhaar_number || null, // adhaar_number
+        null,                     // notes
         now,
         now
       ]

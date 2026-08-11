@@ -1,10 +1,10 @@
 import React, { useRef } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { Download, Printer, CheckCircle2, X, Sparkles } from 'lucide-react';
-import { Member } from '../../types';
+import { Download, Printer, CheckCircle2, X } from 'lucide-react';
+import { Member, Visitor } from '../../types';
 
 interface QRSuccessModalProps {
-  member: Member;
+  member: Member | Visitor;
   onClose: () => void;
 }
 
@@ -13,6 +13,9 @@ const CHURCH_LOGO_SRC = '/logo.png';
 
 export const QRSuccessModal: React.FC<QRSuccessModalProps> = ({ member, onClose }) => {
   const badgeRef = useRef<HTMLDivElement>(null);
+
+  const regText = (member as Member).reg_id || (member as Visitor).visitor_id || '';
+  const adhaarText = member.adhaar_number || '—';
 
   // Download QR Code as PNG with church logo
   const handleDownloadPNG = () => {
@@ -25,7 +28,7 @@ export const QRSuccessModal: React.FC<QRSuccessModalProps> = ({ member, onClose 
     qrImg.onload = () => {
       // Card dimensions
       const CARD_W = 500;
-      const CARD_H = 700;
+      const CARD_H = 720;
       const canvas = document.createElement('canvas');
       // 2x resolution for crisp print quality
       const SCALE = 2;
@@ -67,7 +70,6 @@ export const QRSuccessModal: React.FC<QRSuccessModalProps> = ({ member, onClose 
           const logoSize = 72;
           const logoX = CARD_W / 2 - logoSize / 2;
           const logoY = 27;
-          // Circular clip for logo
           ctx.save();
           ctx.beginPath();
           ctx.arc(CARD_W / 2, logoY + logoSize / 2, logoSize / 2, 0, Math.PI * 2);
@@ -76,7 +78,6 @@ export const QRSuccessModal: React.FC<QRSuccessModalProps> = ({ member, onClose 
           ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
           ctx.restore();
         } else {
-          // Fallback: Draw a small church icon text
           ctx.fillStyle = '#D4AF37';
           ctx.font = 'bold 32px serif';
           ctx.textAlign = 'center';
@@ -106,14 +107,13 @@ export const QRSuccessModal: React.FC<QRSuccessModalProps> = ({ member, onClose 
         ctx.lineTo(CARD_W - 60, 158);
         ctx.stroke();
 
-        // ── Member Name
+        // ── Full Name
         ctx.fillStyle = '#FFFFFF';
         ctx.font = 'bold 26px Arial';
         ctx.fillText(member.full_name, CARD_W / 2, 192);
 
-        // ── Reg ID badge pill
-        const regText = member.reg_id;
-        const pillW = 180;
+        // ── Reg/Visitor ID badge pill
+        const pillW = 190;
         const pillH = 30;
         const pillX = CARD_W / 2 - pillW / 2;
         ctx.fillStyle = 'rgba(245,158,11,0.2)';
@@ -127,9 +127,9 @@ export const QRSuccessModal: React.FC<QRSuccessModalProps> = ({ member, onClose 
         ctx.fillText(regText, CARD_W / 2, 222);
 
         // ── QR Code (white background box)
-        const qrBoxSize = 220;
+        const qrBoxSize = 210;
         const qrBoxX = CARD_W / 2 - qrBoxSize / 2;
-        const qrBoxY = 248;
+        const qrBoxY = 246;
         ctx.fillStyle = '#FFFFFF';
         roundRect(ctx, qrBoxX, qrBoxY, qrBoxSize, qrBoxSize, 16);
         ctx.fill();
@@ -138,21 +138,28 @@ export const QRSuccessModal: React.FC<QRSuccessModalProps> = ({ member, onClose 
         ctx.stroke();
         ctx.drawImage(qrImg, qrBoxX + 10, qrBoxY + 10, qrBoxSize - 20, qrBoxSize - 20);
 
-        // ── Member details below QR
+        // ── Details below QR
         const detailY = qrBoxY + qrBoxSize + 24;
         ctx.fillStyle = '#94A3B8';
         ctx.font = '12px Arial';
-        ctx.fillText(`Mobile:`, CARD_W / 2 - 80, detailY);
+        ctx.fillText(`Mobile:`, CARD_W / 2 - 90, detailY);
         ctx.fillStyle = '#E2E8F0';
         ctx.font = 'bold 12px Arial';
         ctx.fillText(member.mobile_number || '—', CARD_W / 2 + 10, detailY);
 
         ctx.fillStyle = '#94A3B8';
         ctx.font = '12px Arial';
-        ctx.fillText(`Place:`, CARD_W / 2 - 80, detailY + 22);
+        ctx.fillText(`Aadhaar:`, CARD_W / 2 - 90, detailY + 20);
         ctx.fillStyle = '#E2E8F0';
         ctx.font = 'bold 12px Arial';
-        ctx.fillText(member.place_city || '—', CARD_W / 2 + 10, detailY + 22);
+        ctx.fillText(adhaarText, CARD_W / 2 + 10, detailY + 20);
+
+        ctx.fillStyle = '#94A3B8';
+        ctx.font = '12px Arial';
+        ctx.fillText(`Place:`, CARD_W / 2 - 90, detailY + 40);
+        ctx.fillStyle = '#E2E8F0';
+        ctx.font = 'bold 12px Arial';
+        ctx.fillText(member.place_city || '—', CARD_W / 2 + 10, detailY + 40);
 
         // ── Bottom gold separator
         ctx.strokeStyle = '#D4AF37';
@@ -175,7 +182,7 @@ export const QRSuccessModal: React.FC<QRSuccessModalProps> = ({ member, onClose 
         const pngUrl = canvas.toDataURL('image/png');
         const downloadLink = document.createElement('a');
         downloadLink.href = pngUrl;
-        downloadLink.download = `${member.reg_id}_${member.full_name.replace(/\s+/g, '_')}_QR_Badge.png`;
+        downloadLink.download = `${regText}_${member.full_name.replace(/\s+/g, '_')}_QR_Badge.png`;
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
@@ -216,7 +223,7 @@ export const QRSuccessModal: React.FC<QRSuccessModalProps> = ({ member, onClose 
         {/* Modal Close */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors"
+          className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -225,9 +232,9 @@ export const QRSuccessModal: React.FC<QRSuccessModalProps> = ({ member, onClose 
         <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-amber-700 text-white p-6 text-center relative overflow-hidden">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold mb-2">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Member Found</span>
+            <span>Registration Success</span>
           </div>
-          <h3 className="text-xl font-extrabold text-white">Member Digital QR Badge</h3>
+          <h3 className="text-xl font-extrabold text-white">Digital QR Badge</h3>
           <p className="text-xs text-amber-200/80 mt-1">Glorious Apostolic Church India Council</p>
         </div>
 
@@ -249,17 +256,17 @@ export const QRSuccessModal: React.FC<QRSuccessModalProps> = ({ member, onClose 
               </div>
             </div>
 
-            {/* Member Details */}
+            {/* Person Details */}
             <h2 className="text-2xl font-black text-white tracking-tight">{member.full_name}</h2>
             <div className="mt-1 inline-flex items-center px-3 py-1 rounded-lg bg-amber-500/20 text-amber-400 font-mono font-bold text-sm border border-amber-500/30">
-              {member.reg_id}
+              {regText}
             </div>
 
             {/* QR Code Container */}
             <div className="my-6 p-4 bg-white rounded-2xl inline-block shadow-lg border-2 border-amber-400">
               <QRCodeSVG
                 id="member-qr-code-svg"
-                value={member.reg_id}
+                value={regText}
                 size={180}
                 level="H"
                 includeMargin={true}
@@ -268,6 +275,7 @@ export const QRSuccessModal: React.FC<QRSuccessModalProps> = ({ member, onClose 
 
             <div className="text-xs text-slate-400 space-y-1">
               <p>Mobile: <span className="text-slate-200 font-medium">{member.mobile_number}</span></p>
+              <p>Aadhaar No.: <span className="text-amber-400 font-medium font-mono">{adhaarText}</span></p>
               <p>Place: <span className="text-slate-200 font-medium">{member.place_city}</span></p>
               <p className="text-[10px] text-amber-400/80 pt-2 uppercase tracking-widest font-semibold">
                 Scan every Sunday for instant check-in

@@ -110,7 +110,11 @@ export function App() {
 
         {/* PUBLIC: New Visitor Registration Page */}
         {activeTab === 'visitor' && (
-          <VisitorRegistrationForm />
+          <VisitorRegistrationForm
+            onSuccess={(visitor) => {
+              setNewRegisteredMember(visitor as any);
+            }}
+          />
         )}
 
         {/* PUBLIC: QR Search & Download Page */}
