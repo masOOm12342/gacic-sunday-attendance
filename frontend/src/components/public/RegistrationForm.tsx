@@ -61,6 +61,18 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess })
           origin: { y: 0.6 }
         });
         onSuccess(res.member);
+        // Automatically refresh/reset the form fields
+        setFormData({
+          full_name: '',
+          mobile_number: '',
+          address: '',
+          place_city: '',
+          adhaar_number: '',
+          gender: 'Male',
+          dob: '',
+        });
+        setErrorMessage(null);
+        setDuplicateInfo(null);
       } else if (res.isDuplicate && res.existingMember) {
         setDuplicateInfo(res.existingMember);
         setErrorMessage(res.message || 'Duplicate registration detected for this exact Full Name and Mobile Number.');

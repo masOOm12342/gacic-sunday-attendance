@@ -54,8 +54,9 @@ export const VisitorRegistrationForm: React.FC<VisitorRegistrationFormProps> = (
       if (res.success && res.visitor) {
         confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, colors: ['#f59e0b', '#7c3aed', '#10b981'] });
         onSuccess?.(res.visitor);
-        // Reset form
+        // Reset form automatically
         setFormData({ full_name: '', mobile_number: '', address: '', place_city: '', adhaar_number: '', dob: '', invited_by: '' });
+        setErrorMessage(null);
       } else if (res.isDuplicate) {
         setErrorMessage(res.message || 'You are already registered as a visitor.');
       } else {
