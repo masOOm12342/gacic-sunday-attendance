@@ -53,7 +53,10 @@ export interface DashboardStats {
   todayCheckIns: number;
   notCheckedIn: number;
   attendancePercentage: number;
+  isTodaySunday: boolean;
+  activeServiceDate: string;
   recentRegistrations: Member[];
   recentCheckIns: AttendanceRecord[];
+  notCheckedInMembers: Member[];
   attendanceTrend: { service_date: string; count: number }[];
 }

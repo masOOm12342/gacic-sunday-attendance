@@ -87,6 +87,61 @@
   background: linear-gradient(135deg, #0A192F 0%, #1E3A8A 100%);
 }
 
+/* Custom Styling for HTML5 QR Scanner elements */
+#qr-reader-container {
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+#qr-reader-container img[alt="Info icon"],
+#qr-reader-container img[alt="Camera menu icon"] {
+  display: none !important;
+}
+
+#qr-reader-container button {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 0.875rem !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: 0.875rem !important;
+  border: 1px solid rgba(251, 191, 36, 0.4) !important;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease-in-out !important;
+  margin: 1rem auto !important;
+  display: inline-block !important;
+}
+
+#qr-reader-container button:hover {
+  transform: scale(1.03) !important;
+  background: linear-gradient(135deg, #b45309 0%, #92400e 100%) !important;
+}
+
+#qr-reader-container a {
+  color: #fbbf24 !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+}
+
+#qr-reader-container span {
+  color: #e2e8f0 !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+}
+
+#qr-reader-container__header_message {
+  color: #fcd34d !important;
+  background: rgba(15, 23, 42, 0.8) !important;
+  border: 1px solid rgba(251, 191, 36, 0.3) !important;
+  border-radius: 0.75rem !important;
+  padding: 0.75rem !important;
+  margin-bottom: 0.75rem !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+}
+
 /* Print Styles for QR Badges */
 @media print {
   body * {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, Search, FileSpreadsheet, FileText, CheckCircle2, Clock, RefreshCw, Loader2 } from 'lucide-react';
+import { Calendar, Search, FileSpreadsheet, FileText, Clock, RefreshCw, Loader2, ChevronDown, Download } from 'lucide-react';
 import { apiRequest } from '../../utils/api';
 import { downloadWithAuth } from '../../utils/download';
 import { AttendanceRecord } from '../../types';
@@ -10,6 +10,7 @@ export const AttendanceLog: React.FC = () => {
   const [dateFilter, setDateFilter] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [downloading, setDownloading] = useState<string | null>(null);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   const fetchAttendance = async () => {
     setLoading(true);
@@ -31,6 +32,34 @@ export const AttendanceLog: React.FC = () => {
     fetchAttendance();
   }, [dateFilter, searchQuery]);
 
+  const handleExportExcel = async (range: 'current' | 'month' | 'year') => {
+    setShowExportMenu(false);
+    setDownloading(`excel_${range}`);
+    try {
+      let url = '/api/export/attendance/excel';
+      let filename = 'GACIC_Attendance';
+
+      if (range === 'month') {
+        const monthStr = dateFilter ? dateFilter.slice(0, 7) : new Date().toISOString().slice(0, 7);
+        url += `?range=month&month=${monthStr}`;
+        filename += `_Monthly_${monthStr}.xlsx`;
+      } else if (range === 'year') {
+        const yearStr = dateFilter ? dateFilter.slice(0, 4) : String(new Date().getFullYear());
+        url += `?range=year&year=${yearStr}`;
+        filename += `_Yearly_${yearStr}.xlsx`;
+      } else {
+        if (dateFilter) url += `?date=${dateFilter}`;
+        filename += dateFilter ? `_${dateFilter}.xlsx` : '_Report.xlsx';
+      }
+
+      await downloadWithAuth(url, filename);
+    } catch (e) {
+      alert('Export failed. Please try again.');
+    } finally {
+      setDownloading(null);
+    }
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       
@@ -44,24 +73,59 @@ export const AttendanceLog: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            onClick={async () => {
-              setDownloading('excel');
-              try {
-                const filename = `GACIC_Attendance${dateFilter ? '_' + dateFilter : ''}.xlsx`;
-                await downloadWithAuth(`/api/export/attendance/excel${dateFilter ? '?date=' + dateFilter : ''}`, filename);
-              } catch (e) {
-                alert('Export failed. Please try again.');
-              } finally {
-                setDownloading(null);
-              }
-            }}
-            disabled={!!downloading}
-            className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 disabled:opacity-60 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer"
-          >
-            {downloading === 'excel' ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}
-            <span>{downloading === 'excel' ? 'Exporting...' : 'Export Sunday Attendance (Excel)'}</span>
-          </button>
+          {/* Excel Export Menu Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setShowExportMenu(!showExportMenu)}
+              disabled={!!downloading}
+              className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 disabled:opacity-60 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer"
+            >
+              {downloading?.startsWith('excel') ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <FileSpreadsheet className="w-4 h-4" />
+              )}
+              <span>Export Excel</span>
+              <ChevronDown className="w-3.5 h-3.5" />
+            </button>
+
+            {showExportMenu && (
+              <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2 z-30 animate-scale-up space-y-1">
+                <button
+                  onClick={() => handleExportExcel('current')}
+                  className="w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-amber-50 text-xs font-bold text-slate-800 flex items-center gap-2 cursor-pointer"
+                >
+                  <Download className="w-4 h-4 text-amber-600" />
+                  <div>
+                    <div>Week-wise / Date Log</div>
+                    <div className="text-[10px] text-slate-400 font-normal">Filtered or selected Sunday sheet</div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => handleExportExcel('month')}
+                  className="w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-purple-50 text-xs font-bold text-slate-800 flex items-center gap-2 cursor-pointer"
+                >
+                  <Calendar className="w-4 h-4 text-purple-600" />
+                  <div>
+                    <div>Month-wise Attendance Matrix</div>
+                    <div className="text-[10px] text-slate-400 font-normal">All Sundays in selected month</div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => handleExportExcel('year')}
+                  className="w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-indigo-50 text-xs font-bold text-slate-800 flex items-center gap-2 cursor-pointer"
+                >
+                  <FileSpreadsheet className="w-4 h-4 text-indigo-600" />
+                  <div>
+                    <div>Year-wise Attendance Summary</div>
+                    <div className="text-[10px] text-slate-400 font-normal">Full year Sunday summary for all members</div>
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
 
           <button
             onClick={async () => {
@@ -111,7 +175,7 @@ export const AttendanceLog: React.FC = () => {
           {dateFilter && (
             <button
               onClick={() => setDateFilter('')}
-              className="text-xs font-bold text-rose-600 hover:underline"
+              className="text-xs font-bold text-rose-600 hover:underline cursor-pointer"
             >
               Clear Date
             </button>
@@ -119,7 +183,7 @@ export const AttendanceLog: React.FC = () => {
 
           <button
             onClick={fetchAttendance}
-            className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600"
+            className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 cursor-pointer"
             title="Refresh Attendance Log"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -140,7 +204,7 @@ export const AttendanceLog: React.FC = () => {
                 <th className="py-4 px-6">Place / City</th>
                 <th className="py-4 px-6">Check-in Time (IST)</th>
                 <th className="py-4 px-6">Status</th>
-                <th className="py-4 px-6">Scanned By</th>
+                <th className="py-4 px-6">Approved By</th>
               </tr>
             </thead>
 
@@ -171,7 +235,7 @@ export const AttendanceLog: React.FC = () => {
                         {r.status}
                       </span>
                     </td>
-                    <td className="py-4 px-6 text-xs text-slate-500">{r.scanned_by}</td>
+                    <td className="py-4 px-6 text-xs text-slate-600 font-semibold">{r.scanned_by || 'Admin Scanner'}</td>
                   </tr>
                 ))
               ) : (
