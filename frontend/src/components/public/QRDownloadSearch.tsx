@@ -106,7 +106,7 @@ export const QRDownloadSearch: React.FC<QRDownloadSearchProps> = ({ adminUser, o
           Generate & Download Member QR Badge
         </h2>
         <p className="text-sm text-slate-600 mt-2">
-          Enter a <span className="font-bold text-indigo-800">Registration ID (e.g. REG-2026-00001)</span> or <span className="font-bold text-indigo-800">10-digit Mobile Number</span> to generate the badge.
+          Enter a <span className="font-bold text-indigo-800">Registration ID (e.g. REG-{new Date().getFullYear()}-00001)</span> or <span className="font-bold text-indigo-800">10-digit Mobile Number</span> to generate the badge.
         </p>
       </div>
 
@@ -126,7 +126,7 @@ export const QRDownloadSearch: React.FC<QRDownloadSearchProps> = ({ adminUser, o
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="e.g. REG-2026-00001 or 9876543210"
+              placeholder={`e.g. REG-${new Date().getFullYear()}-00001 or 9876543210`}
               className="w-full px-5 py-4 pl-12 rounded-2xl bg-slate-50 border-2 border-slate-200 focus:border-indigo-600 focus:bg-white text-base font-bold text-slate-900 outline-none transition-all"
             />
             <Search className="absolute left-4 top-4.5 w-5 h-5 text-slate-400" />

@@ -175,7 +175,7 @@ export const SundayQRScanner: React.FC<SundayQRScannerProps> = () => {
                 type="text"
                 value={manualCode}
                 onChange={(e) => setManualCode(e.target.value)}
-                placeholder="e.g. REG-2026-00001"
+                placeholder={`e.g. REG-${new Date().getFullYear()}-00001`}
                 className="flex-1 px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-semibold text-slate-900 outline-none focus:border-amber-500"
               />
               <button

@@ -88,7 +88,7 @@ export const VisitorRegistrationForm: React.FC<VisitorRegistrationFormProps> = (
           Welcome to Our Church!
         </h2>
         <p className="text-sm text-slate-600 mt-2 max-w-xl mx-auto">
-          Glorious Apostolic Church India Council — Fill in your details below to receive your automatic <span className="font-bold text-emerald-700">VIS-2026-XXXXX</span> Visitor ID &amp; printable QR badge.
+          Glorious Apostolic Church India Council — Fill in your details below to receive your automatic <span className="font-bold text-emerald-700">VIS-{new Date().getFullYear()}-XXXXX</span> Visitor ID &amp; printable QR badge.
         </p>
       </div>
 

@@ -103,7 +103,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess })
           Register Member &amp; Get Unique QR Badge
         </h2>
         <p className="text-sm text-slate-600 mt-2 max-w-xl mx-auto">
-          Glorious Apostolic Church India Council — Fill in your details below to generate your automatic <span className="font-bold text-purple-700">REG-2026-XXXXX</span> ID &amp; printable Sunday attendance QR code.
+          Glorious Apostolic Church India Council — Fill in your details below to generate your automatic <span className="font-bold text-purple-700">REG-{new Date().getFullYear()}-XXXXX</span> ID &amp; printable Sunday attendance QR code.
         </p>
       </div>
 

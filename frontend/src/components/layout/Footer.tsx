@@ -41,8 +41,8 @@ export const Footer: React.FC = () => {
 
         </div>
 
-        <div className="pt-6 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-          <p>© 2026 Glorious Apostolic Church India Council. All Rights Reserved.</p>
+        <div className="border-t border-slate-800 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-bold text-slate-500">
+          <p>© {new Date().getFullYear()} Glorious Apostolic Church India Council. All Rights Reserved.</p>
           <p className="flex items-center gap-1">
             <span>Powered with</span>
             <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />

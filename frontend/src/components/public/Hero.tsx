@@ -35,7 +35,7 @@ export const Hero: React.FC<HeroProps> = ({
             Seamless <span className="bg-gradient-to-r from-amber-400 via-amber-200 to-amber-500 bg-clip-text text-transparent">QR Code</span> Registration &amp; Sunday Attendance
           </h1>
           <p className="mt-6 text-base sm:text-xl text-slate-300 font-normal leading-relaxed max-w-2xl mx-auto">
-            Welcome church members and guests! Register once to receive your digital QR Badge (`REG-2026-XXXXX`). Scan every Sunday for instant check-in.
+            Welcome church members and guests! Register once to receive your digital QR Badge (`REG-{new Date().getFullYear()}-XXXXX`). Scan every Sunday for instant check-in.
           </p>
         </div>
 
@@ -127,7 +127,7 @@ export const Hero: React.FC<HeroProps> = ({
             <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-purple-400 mb-3 border border-slate-800">
               <QrCode className="w-5 h-5" />
             </div>
-            <h4 className="text-sm font-bold text-white">Sequential REG-2026 IDs</h4>
+            <h4 className="text-sm font-bold text-white">Sequential REG-{new Date().getFullYear()} IDs</h4>
             <p className="text-xs text-slate-400 mt-1">Auto generated non-repeating sequence</p>
           </div>
 

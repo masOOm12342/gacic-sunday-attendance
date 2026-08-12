@@ -1,4 +1,4 @@
-import pool, { execute } from './index';
+import pool, { execute, queryOne } from './index';
 import { getISTDateTimeString } from '../utils/datetime';
 
 export interface SeedMember {
@@ -152,30 +152,18 @@ export const INITIAL_MEMBERS_DATA: SeedMember[] = [
 ];
 
 export async function seedInitialMembers() {
-  console.log('[DB Seed] Starting clean member seeding (137 members)...');
-  const now = getISTDateTimeString();
+  const memberCount = await queryOne<{ count: string | number }>(`SELECT COUNT(*) as count FROM members`);
+  const count = parseInt(String(memberCount?.count || 0), 10);
 
-  // ── STEP 1: Delete ALL existing members for a clean slate ──
-  try {
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-      const deleteResult = await client.query('DELETE FROM members');
-      console.log(`[DB Seed] Deleted ${deleteResult.rowCount} existing members.`);
-      await client.query('COMMIT');
-    } catch (delErr: any) {
-      await client.query('ROLLBACK');
-      console.error('[DB Seed] Failed to delete members:', delErr.message);
-      return;
-    } finally {
-      client.release();
-    }
-  } catch (connErr: any) {
-    console.error('[DB Seed] Pool connection error:', connErr.message);
+  if (count > 0) {
+    console.log(`[DB Seed] Members table already has ${count} records. Skipping seed to preserve live data.`);
     return;
   }
 
-  // ── STEP 2: Insert all 137 members fresh ──
+  console.log('[DB Seed] Members table is empty. Starting initial seed (137 members)...');
+  const now = getISTDateTimeString();
+
+  // ── STEP 1: Insert all 137 members fresh ──
   let insertedCount = 0;
   for (const m of INITIAL_MEMBERS_DATA) {
     try {

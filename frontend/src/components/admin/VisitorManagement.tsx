@@ -428,7 +428,7 @@ export const VisitorManagement: React.FC = () => {
               You are about to transfer <strong>{confirmTransfer.full_name}</strong> from the Visitor list to the official Registered Members list.
             </p>
             <p className="text-xs text-slate-500 bg-slate-50 rounded-xl p-3 mb-6 border border-slate-100">
-              A new sequential <strong>REG-2026-XXXXX</strong> ID will be generated. The visitor will be removed from the Visitor Directory and their QR badge will be available for print.
+              A new sequential <strong>REG-{new Date().getFullYear()}-XXXXX</strong> ID will be generated. The visitor will be removed from the Visitor Directory and their QR badge will be available for print.
             </p>
             <div className="flex gap-3">
               <button
