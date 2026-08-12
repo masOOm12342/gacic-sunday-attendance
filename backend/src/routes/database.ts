@@ -8,7 +8,7 @@ const router = Router();
 router.get('/info', authenticateToken, requireSuperAdmin, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const memberCount = await queryOne<{ count: string | number }>(`SELECT COUNT(*) as count FROM members`);
-    const visitorCount = await queryOne<{ count: string | number }>(`SELECT COUNT(*) as count FROM visitors`);
+    const visitorCount = await queryOne<{ count: string | number }>(`SELECT COUNT(*) as count FROM visitors WHERE (status IS NULL OR TRIM(UPPER(status)) = 'ACTIVE')`);
     const attendanceCount = await queryOne<{ count: string | number }>(`SELECT COUNT(*) as count FROM attendance`);
     const adminCount = await queryOne<{ count: string | number }>(`SELECT COUNT(*) as count FROM admins`);
     const requestCount = await queryOne<{ count: string | number }>(`SELECT COUNT(*) as count FROM admin_requests`);

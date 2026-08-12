@@ -27,10 +27,14 @@ export const VisitorManagement: React.FC = () => {
     setLoading(true);
     setErrorMsg(null);
     try {
-      const res = await apiRequest<{ success: boolean; visitors: Visitor[] }>(
+      const res = await apiRequest<{ success: boolean; visitors: Visitor[]; message?: string }>(
         `/visitors?status=ACTIVE${searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ''}`
       );
-      if (res.success) setVisitors(res.visitors);
+      if (res.success && Array.isArray(res.visitors)) {
+        setVisitors(res.visitors);
+      } else {
+        setErrorMsg(res.message || 'Failed to load visitors list.');
+      }
     } catch {
       setErrorMsg('Failed to load visitors. Please try again.');
     } finally {

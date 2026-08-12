@@ -76,7 +76,7 @@ router.get('/stats', authenticateToken, async (req: AuthenticatedRequest, res: R
 
     // 5b. Recent 5 Visitors (for dashboard Column 1 - New Visitors today)
     const recentVisitors = await query<Visitor>(
-      `SELECT * FROM visitors ORDER BY id DESC LIMIT 5`
+      `SELECT * FROM visitors WHERE (status IS NULL OR TRIM(UPPER(status)) = 'ACTIVE') ORDER BY id DESC LIMIT 5`
     );
 
     // 6. Recent 5 Check-ins (for activeServiceDate or overall)
