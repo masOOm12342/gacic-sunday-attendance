@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   UserCheck, Search, RefreshCw, ArrowUpRight, Trash2, AlertCircle,
-  CheckCircle2, Users, UserPlus, X, Heart
+  CheckCircle2, Users, UserPlus, X, Heart, QrCode, Download, FileText, FileSpreadsheet
 } from 'lucide-react';
 import { apiRequest } from '../../utils/api';
 import { Visitor, Member } from '../../types';
@@ -16,6 +16,7 @@ export const VisitorManagement: React.FC = () => {
   const [errorMsg, setErrorMsg]             = useState<string | null>(null);
   const [successMsg, setSuccessMsg]         = useState<string | null>(null);
   const [transferredMember, setTransferredMember] = useState<Member | null>(null);
+  const [qrVisitor, setQrVisitor]           = useState<Visitor | null>(null);
 
   // Confirm modal state
   const [confirmTransfer, setConfirmTransfer] = useState<Visitor | null>(null);
@@ -87,6 +88,100 @@ export const VisitorManagement: React.FC = () => {
     }
   };
 
+  // ── Export helpers ──────────────────────────────────────────────────────────
+
+  const exportCSV = () => {
+    const headers = ['Visitor ID', 'Full Name', 'Mobile Number', 'Gender', 'Address', 'Date of Birth', 'Aadhaar Number', 'Referred By', 'Registered On'];
+    const rows = visitors.map(v => [
+      v.visitor_id,
+      v.full_name,
+      v.mobile_number,
+      v.gender || '',
+      v.address,
+      v.dob || '',
+      v.adhaar_number || '',
+      v.invited_by || '',
+      v.created_at,
+    ]);
+    const csvContent = [headers, ...rows].map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `visitors_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportPDF = () => {
+    const win = window.open('', '_blank');
+    if (!win) return;
+
+    const rows = visitors.map(v => `
+      <tr>
+        <td>${v.visitor_id}</td>
+        <td>${v.full_name}</td>
+        <td>${v.mobile_number}</td>
+        <td>${v.gender || '-'}</td>
+        <td>${v.address}</td>
+        <td>${v.dob || '-'}</td>
+        <td>${v.adhaar_number || '-'}</td>
+        <td>${v.invited_by || '-'}</td>
+        <td>${v.created_at}</td>
+      </tr>`).join('');
+
+    win.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Visitor Directory</title>
+        <style>
+          body { font-family: Arial, sans-serif; font-size: 11px; padding: 20px; }
+          h2 { color: #1e293b; margin-bottom: 4px; }
+          p { color: #64748b; margin-bottom: 16px; font-size: 10px; }
+          table { width: 100%; border-collapse: collapse; }
+          th { background: #0f172a; color: white; padding: 8px 6px; text-align: left; font-size: 10px; }
+          td { padding: 6px; border-bottom: 1px solid #e2e8f0; }
+          tr:nth-child(even) { background: #f8fafc; }
+        </style>
+      </head>
+      <body>
+        <h2>Glorious Apostolic Church — Visitor Directory</h2>
+        <p>Exported on ${new Date().toLocaleString('en-IN')} &nbsp;|&nbsp; Total: ${visitors.length} visitors</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Visitor ID</th><th>Name</th><th>Mobile</th><th>Gender</th><th>Address</th><th>DOB</th><th>Aadhaar</th><th>Referred By</th><th>Registered</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </body>
+      </html>
+    `);
+    win.document.close();
+    win.focus();
+    setTimeout(() => win.print(), 500);
+  };
+
+  // ── Visitor QR modal adapter ─────────────────────────────────────────────
+  // QRSuccessModal expects a Member shape; we adapt the Visitor to fit
+  const visitorAsMember = (v: Visitor): Member => ({
+    id: v.id,
+    reg_id: v.visitor_id,
+    full_name: v.full_name,
+    mobile_number: v.mobile_number,
+    address: v.address,
+    place_city: v.place_city || v.address,
+    gender: v.gender || null,
+    dob: v.dob || null,
+    adhaar_number: v.adhaar_number || null,
+    email: null,
+    notes: null,
+    created_at: v.created_at,
+    updated_at: v.updated_at,
+  });
+
   return (
     <div className="space-y-6 animate-fade-in">
 
@@ -105,12 +200,36 @@ export const VisitorManagement: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 ml-11 sm:ml-0">
+          <div className="flex items-center gap-2 ml-11 sm:ml-0 flex-wrap">
             {/* Counter badge */}
             <div className="px-4 py-2 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-bold flex items-center gap-2">
               <Users className="w-4 h-4" />
-              <span>{visitors.length} Active</span>
+              <span>{visitors.length} Visitors</span>
             </div>
+
+            {/* Export Excel (CSV) */}
+            <button
+              onClick={exportCSV}
+              disabled={visitors.length === 0}
+              title="Export as Excel/CSV"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors cursor-pointer disabled:opacity-40"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Excel</span>
+            </button>
+
+            {/* Export PDF */}
+            <button
+              onClick={exportPDF}
+              disabled={visitors.length === 0}
+              title="Export as PDF"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-colors cursor-pointer disabled:opacity-40"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">PDF</span>
+            </button>
+
+            {/* Refresh */}
             <button
               onClick={fetchVisitors}
               className="p-3 rounded-2xl bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-colors cursor-pointer"
@@ -169,7 +288,7 @@ export const VisitorManagement: React.FC = () => {
           <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
             <UserPlus className="w-8 h-8 text-slate-400" />
           </div>
-          <h3 className="text-lg font-bold text-slate-900 mb-1">No Active Visitors Found</h3>
+          <h3 className="text-lg font-bold text-slate-900 mb-1">No Visitors Found</h3>
           <p className="text-sm text-slate-400">
             {searchQuery ? 'No visitors match your search. Try different keywords.' : 'No first-time visitors have been registered yet.'}
           </p>
@@ -194,9 +313,15 @@ export const VisitorManagement: React.FC = () => {
                     <div className="text-[11px] text-slate-500 font-mono">{visitor.visitor_id}</div>
                   </div>
                 </div>
-                <span className="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-bold text-[10px] shrink-0 border border-emerald-200">
-                  ACTIVE
-                </span>
+                {/* View QR button (top-right) */}
+                <button
+                  onClick={() => setQrVisitor(visitor)}
+                  title="View QR"
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-[11px] font-bold transition-colors cursor-pointer shrink-0"
+                >
+                  <QrCode className="w-3.5 h-3.5" />
+                  View QR
+                </button>
               </div>
 
               {/* Details */}
@@ -205,17 +330,25 @@ export const VisitorManagement: React.FC = () => {
                   <span className="font-bold text-slate-500 w-14 shrink-0">Mobile</span>
                   <span className="font-semibold text-slate-800">{visitor.mobile_number}</span>
                 </div>
+                {visitor.gender && (
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-slate-500 w-14 shrink-0">Gender</span>
+                    <span className="text-slate-700">{visitor.gender}</span>
+                  </div>
+                )}
                 <div className="flex items-start gap-1.5">
                   <span className="font-bold text-slate-500 w-14 shrink-0">Address</span>
                   <span className="truncate text-slate-700">{visitor.address}</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="font-bold text-slate-500 w-14 shrink-0">City</span>
-                  <span className="text-slate-700">{visitor.place_city}</span>
-                </div>
+                {visitor.dob && (
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-slate-500 w-14 shrink-0">DOB</span>
+                    <span className="text-slate-700">{visitor.dob}</span>
+                  </div>
+                )}
                 {visitor.invited_by && (
                   <div className="flex items-center gap-1.5">
-                    <span className="font-bold text-slate-500 w-14 shrink-0">Invited</span>
+                    <span className="font-bold text-slate-500 w-14 shrink-0">Referred</span>
                     <span className="text-slate-700">{visitor.invited_by}</span>
                   </div>
                 )}
@@ -339,6 +472,14 @@ export const VisitorManagement: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* QR Badge modal for visitor */}
+      {qrVisitor && (
+        <QRSuccessModal
+          member={visitorAsMember(qrVisitor)}
+          onClose={() => setQrVisitor(null)}
+        />
       )}
 
       {/* QR Badge modal after successful transfer */}

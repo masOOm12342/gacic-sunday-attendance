@@ -21,6 +21,7 @@ export interface Visitor {
   mobile_number: string;
   address: string;
   place_city: string;
+  gender?: string | null;
   adhaar_number?: string | null;
   dob?: string | null;
   invited_by?: string | null;

@@ -16,6 +16,7 @@ export const VisitorRegistrationForm: React.FC<VisitorRegistrationFormProps> = (
     mobile_number: '',
     address: '',
     dob: '',
+    gender: '',
     invited_by: '',
     adhaar_number: '',
   });
@@ -23,7 +24,7 @@ export const VisitorRegistrationForm: React.FC<VisitorRegistrationFormProps> = (
   const [loading, setLoading]           = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (errorMessage) setErrorMessage(null);
   };
@@ -57,7 +58,7 @@ export const VisitorRegistrationForm: React.FC<VisitorRegistrationFormProps> = (
         confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, colors: ['#f59e0b', '#7c3aed', '#10b981'] });
         onSuccess?.(res.visitor);
         // Reset form automatically
-        setFormData({ full_name: '', mobile_number: '', address: '', dob: '', invited_by: '', adhaar_number: '' });
+        setFormData({ full_name: '', mobile_number: '', address: '', dob: '', gender: '', invited_by: '', adhaar_number: '' });
         setErrorMessage(null);
       } else if (res.isDuplicate) {
         setErrorMessage(res.message || 'You are already registered as a visitor.');
@@ -162,8 +163,27 @@ export const VisitorRegistrationForm: React.FC<VisitorRegistrationFormProps> = (
 
           </div>
 
-          {/* Row 3: Referred By & Aadhaar Number (Optional) */}
+          {/* Row 3: Gender & Referred By */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+            {/* Gender (Required) */}
+            <div className="floating-label-group">
+              <select
+                id="visitor_gender"
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                required
+                className="floating-input"
+              >
+                <option value=""> </option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+              <label htmlFor="visitor_gender" className="floating-label">
+                Gender <span className="text-rose-500">*</span>
+              </label>
+            </div>
 
             {/* Referred By */}
             <div className="floating-label-group">
@@ -181,6 +201,11 @@ export const VisitorRegistrationForm: React.FC<VisitorRegistrationFormProps> = (
               </label>
               <UserCheck className="absolute right-3.5 top-4 w-4 h-4 text-slate-400 pointer-events-none" />
             </div>
+
+          </div>
+
+          {/* Row 4: Aadhaar Number (Optional) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
             {/* Aadhaar Number (Optional) */}
             <div className="floating-label-group">

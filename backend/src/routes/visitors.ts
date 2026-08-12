@@ -12,7 +12,7 @@ const router = Router();
 // ──────────────────────────────────────────────────────────────
 router.post('/register', async (req: Request, res: Response) => {
   try {
-    const { full_name, mobile_number, address, place_city, adhaar_number, dob, invited_by } = req.body;
+    const { full_name, mobile_number, address, place_city, adhaar_number, dob, invited_by, gender } = req.body;
 
     if (!full_name || !mobile_number || !address || !dob) {
       return res.status(400).json({
@@ -43,15 +43,16 @@ router.post('/register', async (req: Request, res: Response) => {
     const now = getISTDateTimeString();
 
     const result = await execute(
-      `INSERT INTO visitors (visitor_id, full_name, mobile_number, address, place_city, adhaar_number, dob, invited_by, status, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVE', ?, ?)`,
+      `INSERT INTO visitors (visitor_id, full_name, mobile_number, address, place_city, gender, adhaar_number, dob, invited_by, status, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVE', ?, ?)`,
       [
         visitor_id,
         cleanName,
         cleanMobile,
         address.trim(),
-        place_city.trim(),
-        adhaar_number.trim(),
+        place_city ? place_city.trim() : address.trim(),
+        gender ? gender.trim() : null,
+        adhaar_number ? adhaar_number.trim() : null,
         dob ? dob.trim() : null,
         invited_by ? invited_by.trim() : null,
         now,
@@ -168,9 +169,9 @@ router.post('/:id/transfer', authenticateToken, async (req: AuthenticatedRequest
         null,                     // email
         visitor.address,
         visitor.place_city,
-        null,                     // gender
-        visitor.dob || null,      // dob
-        visitor.adhaar_number || null, // adhaar_number
+        (visitor as any).gender || null,  // carry over gender from visitor
+        visitor.dob || null,
+        visitor.adhaar_number || null,
         null,                     // notes
         now,
         now

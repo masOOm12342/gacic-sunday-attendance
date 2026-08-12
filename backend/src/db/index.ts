@@ -91,6 +91,7 @@ export async function initDatabase() {
       mobile_number VARCHAR(20) NOT NULL,
       address TEXT NOT NULL,
       place_city VARCHAR(100) NOT NULL,
+      gender VARCHAR(20),
       adhaar_number VARCHAR(30),
       dob VARCHAR(30),
       invited_by VARCHAR(150),
@@ -105,6 +106,7 @@ export async function initDatabase() {
   try {
     await execute(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS adhaar_number VARCHAR(30);`);
     await execute(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS dob VARCHAR(30);`);
+    await execute(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS gender VARCHAR(20);`);
   } catch (e) {
     // Ignore if columns exist
   }
@@ -234,24 +236,31 @@ export async function generateNextRegistrationId(): Promise<string> {
 }
 
 /**
- * Generate sequential Visitor ID: VIS-2026-00001, VIS-2026-00002...
+ * Generate the lowest available Visitor ID: VIS-2026-00001, VIS-2026-00002...
+ * Gap-filling: if VIS-2026-00001 was deleted, the next visitor gets VIS-2026-00001.
  */
 export async function generateNextVisitorId(): Promise<string> {
   const currentYear = new Date().getFullYear();
-  const lastVisitor = await queryOne<{ visitor_id: string }>(
-    `SELECT visitor_id FROM visitors ORDER BY id DESC LIMIT 1`
+  const prefix = `VIS-${currentYear}-`;
+
+  // Get all existing visitor IDs for this year, sorted numerically
+  const rows = await query<{ visitor_id: string }>(
+    `SELECT visitor_id FROM visitors WHERE visitor_id LIKE ? ORDER BY visitor_id ASC`,
+    [`${prefix}%`]
   );
 
-  let nextSeq = 1;
-  if (lastVisitor && lastVisitor.visitor_id) {
-    const match = lastVisitor.visitor_id.match(/VIS-\d+-(\d+)/);
-    if (match && match[1]) {
-      nextSeq = parseInt(match[1], 10) + 1;
-    }
+  // Build a set of used sequence numbers
+  const usedNums = new Set<number>();
+  for (const row of rows) {
+    const match = row.visitor_id.match(/VIS-\d+-(\d+)/);
+    if (match) usedNums.add(parseInt(match[1], 10));
   }
 
-  const paddedSeq = String(nextSeq).padStart(5, '0');
-  return `VIS-${currentYear}-${paddedSeq}`;
+  // Find the smallest positive integer not in use
+  let nextSeq = 1;
+  while (usedNums.has(nextSeq)) nextSeq++;
+
+  return `${prefix}${String(nextSeq).padStart(5, '0')}`;
 }
 
 export default pool;
