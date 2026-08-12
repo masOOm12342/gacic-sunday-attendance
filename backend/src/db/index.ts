@@ -224,6 +224,28 @@ export async function initDatabase() {
     console.error('[DB Seed Error]', seedErr);
   }
 
+  // 8. Resequence member IDs starting from 1 if sequence drifted due to previous seed wipes
+  try {
+    const firstMem = await queryOne<{ id: number }>(`SELECT id FROM members WHERE reg_id = 'REG-2026-00001'`);
+    if (firstMem && Number(firstMem.id) > 100) {
+      console.log('[DB Fix] Resequencing member IDs to start cleanly from 1...');
+      await execute(`
+        WITH renumbered AS (
+          SELECT id, ROW_NUMBER() OVER (ORDER BY reg_id ASC) as new_id
+          FROM members
+        )
+        UPDATE members m
+        SET id = r.new_id
+        FROM renumbered r
+        WHERE m.id = r.id;
+      `);
+      await execute(`SELECT setval(pg_get_serial_sequence('members', 'id'), (SELECT MAX(id) FROM members), true);`);
+      console.log('[DB Fix] Member IDs resequenced successfully!');
+    }
+  } catch (reseqErr) {
+    console.error('[DB Resequence Error]', reseqErr);
+  }
+
   console.log('[DB] Neon PostgreSQL Database Initialized Successfully.');
 }
 
