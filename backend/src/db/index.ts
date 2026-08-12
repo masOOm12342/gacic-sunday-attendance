@@ -156,11 +156,16 @@ export async function initDatabase() {
       email VARCHAR(120) UNIQUE NOT NULL,
       mobile_number VARCHAR(20) NOT NULL,
       reason TEXT NOT NULL,
+      password_hash VARCHAR(255),
       status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
       created_at VARCHAR(50) NOT NULL,
       reviewed_at VARCHAR(50)
     );
   `);
+
+  try {
+    await execute(`ALTER TABLE admin_requests ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255);`);
+  } catch (e) {}
 
   // 5. System Settings Table
   await execute(`

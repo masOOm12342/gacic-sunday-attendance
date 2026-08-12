@@ -92,10 +92,14 @@ router.get('/me', authenticateToken, async (req: AuthenticatedRequest, res: Resp
 // POST /api/auth/request-access
 router.post('/request-access', async (req: Request, res: Response) => {
   try {
-    const { full_name, email, mobile_number, reason } = req.body;
+    const { full_name, email, mobile_number, reason, password } = req.body;
 
-    if (!full_name || !email || !mobile_number || !reason) {
-      return res.status(400).json({ success: false, message: 'All fields are required.' });
+    if (!full_name || !email || !mobile_number || !reason || !password) {
+      return res.status(400).json({ success: false, message: 'All fields including Password are required.' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ success: false, message: 'Password must be at least 6 characters long.' });
     }
 
     const cleanEmail = email.trim().toLowerCase();
@@ -114,15 +118,16 @@ router.post('/request-access', async (req: Request, res: Response) => {
       });
     }
 
+    const passwordHash = bcrypt.hashSync(password, 10);
     const now = getISTDateTimeString();
     await execute(
-      `INSERT INTO admin_requests (full_name, email, mobile_number, reason, status, created_at) VALUES (?, ?, ?, ?, 'PENDING', ?)`,
-      [full_name.trim(), cleanEmail, mobile_number.trim(), reason.trim(), now]
+      `INSERT INTO admin_requests (full_name, email, mobile_number, reason, password_hash, status, created_at) VALUES (?, ?, ?, ?, ?, 'PENDING', ?)`,
+      [full_name.trim(), cleanEmail, mobile_number.trim(), reason.trim(), passwordHash, now]
     );
 
     return res.status(201).json({
       success: true,
-      message: 'Admin access request submitted successfully! It is now pending approval by the Super Admin.'
+      message: 'Admin access request submitted successfully with your password! It is now pending approval by the Super Admin.'
     });
   } catch (error: any) {
     console.error('Admin request error:', error);

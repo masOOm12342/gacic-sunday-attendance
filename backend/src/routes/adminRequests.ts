@@ -34,9 +34,11 @@ router.post('/:id/approve', authenticateToken, requireSuperAdmin, async (req: Au
       return res.status(400).json({ success: false, message: 'This request is already approved.' });
     }
 
-    const { role = 'ADMIN', temporary_password = 'ChurchAdmin@2026' } = req.body;
-    const passwordHash = bcrypt.hashSync(temporary_password, 10);
+    const { role = 'ADMIN' } = req.body;
     const now = getISTDateTimeString();
+
+    // Use password_hash set by applicant, or fallback to temporary default
+    const passwordHash = requestItem.password_hash || bcrypt.hashSync('ChurchAdmin@2026', 10);
 
     // 1. Create or update admin account
     const existingAdmin = await queryOne(`SELECT id FROM admins WHERE LOWER(email) = LOWER(?)`, [requestItem.email]);
@@ -60,7 +62,7 @@ router.post('/:id/approve', authenticateToken, requireSuperAdmin, async (req: Au
 
     return res.json({
       success: true,
-      message: `Admin access approved for ${requestItem.full_name} (${requestItem.email})! Temporary Password: ${temporary_password}`
+      message: `Admin access approved for ${requestItem.full_name} (${requestItem.email})! They can now log in with the password they set during registration.`
     });
   } catch (error: any) {
     console.error('Approve error:', error);

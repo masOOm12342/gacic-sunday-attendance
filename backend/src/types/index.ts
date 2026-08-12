@@ -62,6 +62,7 @@ export interface AdminRequest {
   email: string;
   mobile_number: string;
   reason: string;
+  password_hash?: string | null;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   created_at: string;
   reviewed_at?: string | null;

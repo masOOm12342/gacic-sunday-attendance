@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserPlus, X, Mail, Phone, User, FileText, CheckCircle2, AlertCircle } from 'lucide-react';
+import { UserPlus, X, Mail, Phone, User, FileText, CheckCircle2, AlertCircle, Lock } from 'lucide-react';
 import { apiRequest } from '../../utils/api';
 
 interface AdminRequestModalProps {
@@ -12,6 +12,8 @@ export const AdminRequestModal: React.FC<AdminRequestModalProps> = ({ onClose })
     email: '',
     mobile_number: '',
     reason: '',
+    password: '',
+    confirm_password: '',
   });
 
   const [loading, setLoading] = useState(false);
@@ -20,8 +22,18 @@ export const AdminRequestModal: React.FC<AdminRequestModalProps> = ({ onClose })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.full_name || !formData.email || !formData.mobile_number || !formData.reason) {
+    if (!formData.full_name || !formData.email || !formData.mobile_number || !formData.reason || !formData.password) {
       setError('All fields are required.');
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
+
+    if (formData.password !== formData.confirm_password) {
+      setError('Passwords do not match.');
       return;
     }
 
@@ -164,6 +176,45 @@ export const AdminRequestModal: React.FC<AdminRequestModalProps> = ({ onClose })
                     className="w-full px-4 py-3 pl-10 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm outline-none focus:border-amber-400 resize-none"
                   />
                   <FileText className="absolute left-3 top-3.5 w-4 h-4 text-slate-500" />
+                </div>
+              </div>
+
+              {/* Set Password */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+                    Create Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="password"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      required
+                      minLength={6}
+                      placeholder="At least 6 characters"
+                      className="w-full px-4 py-3 pl-10 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm outline-none focus:border-amber-400"
+                    />
+                    <Lock className="absolute left-3 top-3.5 w-4 h-4 text-slate-500" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="password"
+                      value={formData.confirm_password}
+                      onChange={(e) => setFormData({ ...formData, confirm_password: e.target.value })}
+                      required
+                      minLength={6}
+                      placeholder="Re-enter password"
+                      className="w-full px-4 py-3 pl-10 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm outline-none focus:border-amber-400"
+                    />
+                    <Lock className="absolute left-3 top-3.5 w-4 h-4 text-slate-500" />
+                  </div>
                 </div>
               </div>
 
