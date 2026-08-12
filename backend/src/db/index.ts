@@ -104,11 +104,19 @@ export async function initDatabase() {
   `);
 
   try {
+    await execute(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS place_city VARCHAR(100);`);
+    await execute(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS gender VARCHAR(20);`);
     await execute(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS adhaar_number VARCHAR(30);`);
     await execute(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS dob VARCHAR(30);`);
-    await execute(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS gender VARCHAR(20);`);
+    await execute(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS invited_by VARCHAR(150);`);
+    await execute(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS notes TEXT;`);
+    await execute(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'ACTIVE';`);
+    await execute(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS transferred_member_reg_id VARCHAR(30);`);
+    await execute(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS created_at VARCHAR(50) DEFAULT '';`);
+    await execute(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS updated_at VARCHAR(50) DEFAULT '';`);
+    await execute(`UPDATE visitors SET status = 'ACTIVE' WHERE status IS NULL;`);
   } catch (e) {
-    // Ignore if columns exist
+    console.error('[DB Migration Error for visitors table]', e);
   }
 
   // 2. Sunday Attendance Table
