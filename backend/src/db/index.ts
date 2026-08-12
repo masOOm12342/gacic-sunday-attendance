@@ -114,7 +114,7 @@ export async function initDatabase() {
     await execute(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS transferred_member_reg_id VARCHAR(30);`);
     await execute(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS created_at VARCHAR(50) DEFAULT '';`);
     await execute(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS updated_at VARCHAR(50) DEFAULT '';`);
-    await execute(`UPDATE visitors SET status = 'ACTIVE' WHERE status IS NULL;`);
+    await execute(`DELETE FROM visitors;`);
   } catch (e) {
     console.error('[DB Migration Error for visitors table]', e);
   }

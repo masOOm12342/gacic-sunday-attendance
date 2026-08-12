@@ -31,4 +31,14 @@ router.get('/info', authenticateToken, requireSuperAdmin, async (req: Authentica
   }
 });
 
+// Super Admin: POST /api/database/clear-visitors
+router.post('/clear-visitors', authenticateToken, requireSuperAdmin, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    await query(`DELETE FROM visitors`);
+    return res.json({ success: true, message: 'Visitors table cleared successfully.' });
+  } catch (error: any) {
+    return res.status(500).json({ success: false, message: 'Failed to clear visitors table.' });
+  }
+});
+
 export default router;
