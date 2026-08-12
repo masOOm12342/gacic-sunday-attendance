@@ -91,20 +91,26 @@ export const VisitorManagement: React.FC = () => {
   // ── Export helpers ──────────────────────────────────────────────────────────
 
   const exportCSV = () => {
+    // Helper: wrap value in ="..." so Excel treats it as plain text (no scientific notation, no date parsing)
+    const textCell = (val: string) => `="${val.replace(/"/g, '""')}"`;
+    const plainCell = (val: string) => `"${val.replace(/"/g, '""')}"`;
+
     const headers = ['Visitor ID', 'Full Name', 'Mobile Number', 'Gender', 'Address', 'Date of Birth', 'Aadhaar Number', 'Referred By', 'Registered On'];
     const rows = visitors.map(v => [
-      v.visitor_id,
-      v.full_name,
-      v.mobile_number,
-      v.gender || '',
-      v.address,
-      v.dob || '',
-      v.adhaar_number || '',
-      v.invited_by || '',
-      v.created_at,
+      textCell(v.visitor_id),
+      plainCell(v.full_name),
+      textCell(v.mobile_number),           // force text — prevents 9.92E+09
+      plainCell(v.gender || ''),
+      plainCell(v.address),
+      textCell(v.dob || ''),               // force text — prevents date reformat
+      textCell(v.adhaar_number || ''),      // force text — prevents scientific notation
+      plainCell(v.invited_by || ''),
+      textCell(v.created_at),              // force text — prevents ######## 
     ]);
-    const csvContent = [headers, ...rows].map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const headerRow = headers.map(h => plainCell(h)).join(',');
+    const csvContent = [headerRow, ...rows.map(r => r.join(','))].join('\n');
+    const BOM = '\uFEFF'; // UTF-8 BOM for proper encoding in Excel
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
