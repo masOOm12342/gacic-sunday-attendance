@@ -86,7 +86,7 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
 
     // Default: only show ACTIVE visitors; pass ?status=ALL to see transferred too
     if (!status || status === 'ACTIVE') {
-      sql += ` AND TRIM(UPPER(status)) = 'ACTIVE'`;
+      sql += ` AND (status IS NULL OR TRIM(UPPER(status)) != 'TRANSFERRED')`;
     }
 
     if (search) {
