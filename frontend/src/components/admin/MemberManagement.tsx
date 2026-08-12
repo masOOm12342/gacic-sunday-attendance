@@ -4,6 +4,7 @@ import { apiRequest } from '../../utils/api';
 import { downloadWithAuth } from '../../utils/download';
 import { Member } from '../../types';
 import { QRSuccessModal } from '../public/QRSuccessModal';
+import { emitDataEvent, onDataEvent } from '../../utils/dataEvents';
 
 export const MemberManagement: React.FC = () => {
   const [members, setMembers] = useState<Member[]>([]);
@@ -52,6 +53,12 @@ export const MemberManagement: React.FC = () => {
     fetchMembers();
   }, [searchTerm, genderFilter]);
 
+  // Live-sync: re-fetch when members change in another tab (e.g. visitor transfer)
+  useEffect(() => {
+    const unsub = onDataEvent('members:changed', fetchMembers);
+    return unsub;
+  }, [searchTerm, genderFilter]);
+
   const handleOpenAdd = () => {
     setMemberForm({
       full_name: '',
@@ -98,6 +105,7 @@ export const MemberManagement: React.FC = () => {
         if (res.success) {
           setEditingMember(null);
           fetchMembers();
+          emitDataEvent('members:changed');
         } else {
           setFormError(res.message);
         }
@@ -108,6 +116,7 @@ export const MemberManagement: React.FC = () => {
           setShowAddModal(false);
           fetchMembers();
           setQrModalMember(res.member);
+          emitDataEvent('members:changed');
         } else {
           setFormError(res.message);
         }
@@ -124,6 +133,7 @@ export const MemberManagement: React.FC = () => {
       if (res.success) {
         setDeletingMember(null);
         fetchMembers();
+        emitDataEvent('members:changed');
       }
     } catch (err) {
       console.error('Delete error:', err);

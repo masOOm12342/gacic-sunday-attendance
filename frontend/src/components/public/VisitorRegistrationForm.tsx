@@ -5,6 +5,7 @@ import {
 import confetti from 'canvas-confetti';
 import { apiRequest } from '../../utils/api';
 import { Visitor } from '../../types';
+import { emitDataEvent } from '../../utils/dataEvents';
 
 interface VisitorRegistrationFormProps {
   onSuccess?: (visitor: Visitor) => void;
@@ -57,6 +58,8 @@ export const VisitorRegistrationForm: React.FC<VisitorRegistrationFormProps> = (
       if (res.success && res.visitor) {
         confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, colors: ['#f59e0b', '#7c3aed', '#10b981'] });
         onSuccess?.(res.visitor);
+        // Live-sync: notify all listening admin tabs (Visitors, Dashboard, etc.)
+        emitDataEvent('visitors:changed');
         // Reset form automatically
         setFormData({ full_name: '', mobile_number: '', address: '', dob: '', gender: '', invited_by: '', adhaar_number: '' });
         setErrorMessage(null);

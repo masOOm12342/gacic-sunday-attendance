@@ -3,6 +3,7 @@ import { Users, CheckCircle2, UserX, TrendingUp, QrCode, UserPlus, ArrowUpRight,
 import { apiRequest } from '../../utils/api';
 import { DashboardStats } from '../../types';
 import { formatISTDate } from '../../utils/datetime';
+import { onDataEvent } from '../../utils/dataEvents';
 
 interface DashboardOverviewProps {
   onNavigateTab: (tab: 'scanner' | 'members' | 'visitors' | 'attendance' | 'requests' | 'database') => void;
@@ -30,6 +31,9 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate
 
   useEffect(() => {
     fetchStats();
+    // Live-sync: re-fetch whenever data changes in another tab
+    const unsub = onDataEvent('dashboard:refresh', fetchStats);
+    return unsub;
   }, []);
 
   const isSunday = stats?.isTodaySunday ?? false;

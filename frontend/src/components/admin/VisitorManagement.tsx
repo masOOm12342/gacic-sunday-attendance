@@ -6,6 +6,7 @@ import {
 import { apiRequest } from '../../utils/api';
 import { Visitor, Member } from '../../types';
 import { QRSuccessModal } from '../public/QRSuccessModal';
+import { emitDataEvent, onDataEvent } from '../../utils/dataEvents';
 
 export const VisitorManagement: React.FC = () => {
   const [visitors, setVisitors]             = useState<Visitor[]>([]);
@@ -42,6 +43,12 @@ export const VisitorManagement: React.FC = () => {
     return () => clearTimeout(t);
   }, [fetchVisitors, searchQuery]);
 
+  // Live-sync: re-fetch when external events add/remove visitors
+  useEffect(() => {
+    const unsub = onDataEvent('visitors:changed', fetchVisitors);
+    return unsub;
+  }, [fetchVisitors]);
+
   const handleTransfer = async (visitor: Visitor) => {
     setTransferring(visitor.id);
     setErrorMsg(null);
@@ -55,6 +62,8 @@ export const VisitorManagement: React.FC = () => {
         setSuccessMsg(res.message);
         setTransferredMember(res.member);
         setVisitors(prev => prev.filter(v => v.id !== visitor.id));
+        emitDataEvent('visitors:changed');
+        emitDataEvent('members:changed');
       } else {
         setErrorMsg(res.message || 'Transfer failed. Please try again.');
       }
@@ -77,6 +86,7 @@ export const VisitorManagement: React.FC = () => {
       if (res.success) {
         setVisitors(prev => prev.filter(v => v.id !== visitor.id));
         setSuccessMsg(res.message);
+        emitDataEvent('visitors:changed');
       } else {
         setErrorMsg(res.message || 'Failed to delete visitor.');
       }

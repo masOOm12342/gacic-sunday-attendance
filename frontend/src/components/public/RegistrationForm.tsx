@@ -3,6 +3,7 @@ import { User, Phone, MapPin, Calendar, AlertTriangle, Sparkles, ArrowRight, Cre
 import confetti from 'canvas-confetti';
 import { apiRequest } from '../../utils/api';
 import { Member } from '../../types';
+import { emitDataEvent } from '../../utils/dataEvents';
 
 interface RegistrationFormProps {
   onSuccess: (member: Member) => void;
@@ -63,6 +64,8 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess })
           origin: { y: 0.6 }
         });
         onSuccess(res.member);
+        // Live-sync: notify all listening admin tabs (Members, Dashboard, etc.)
+        emitDataEvent('members:changed');
         // Automatically refresh/reset the form fields
         setFormData({
           full_name: '',

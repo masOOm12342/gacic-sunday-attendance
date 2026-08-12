@@ -3,6 +3,7 @@ import { Calendar, Search, FileSpreadsheet, FileText, Clock, RefreshCw, Loader2,
 import { apiRequest } from '../../utils/api';
 import { downloadWithAuth } from '../../utils/download';
 import { AttendanceRecord } from '../../types';
+import { onDataEvent } from '../../utils/dataEvents';
 
 export const AttendanceLog: React.FC = () => {
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
@@ -30,6 +31,12 @@ export const AttendanceLog: React.FC = () => {
 
   useEffect(() => {
     fetchAttendance();
+  }, [dateFilter, searchQuery]);
+
+  // Live-sync: re-fetch when attendance is recorded in scanner or elsewhere
+  useEffect(() => {
+    const unsub = onDataEvent('attendance:changed', fetchAttendance);
+    return unsub;
   }, [dateFilter, searchQuery]);
 
   const handleExportExcel = async (range: 'current' | 'month' | 'year') => {

@@ -3,6 +3,7 @@ import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
 import { QrCode, CheckCircle2, AlertTriangle, UserCheck, RefreshCw, Volume2, Search, ArrowRight } from 'lucide-react';
 import { apiRequest } from '../../utils/api';
 import { Member, AttendanceRecord } from '../../types';
+import { emitDataEvent } from '../../utils/dataEvents';
 
 interface SundayQRScannerProps {
   onCheckInSuccess?: () => void;
@@ -70,6 +71,7 @@ export const SundayQRScanner: React.FC<SundayQRScannerProps> = () => {
           member: res.member,
           attendance: res.attendance
         });
+        emitDataEvent('attendance:changed');
       } else if (res.alreadyCheckedIn && res.member) {
         playAudioChime('warning');
         setScanResult({
