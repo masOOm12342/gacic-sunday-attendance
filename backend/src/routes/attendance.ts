@@ -114,7 +114,7 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
 
     if (search) {
       const searchPattern = `%${String(search).trim()}%`;
-      sql += ` AND (a.reg_id LIKE ? OR m.full_name LIKE ? OR m.mobile_number LIKE ? OR m.place_city LIKE ?)`;
+      sql += ` AND (a.reg_id ILIKE ? OR m.full_name ILIKE ? OR m.mobile_number ILIKE ? OR m.place_city ILIKE ?)`;
       params.push(searchPattern, searchPattern, searchPattern, searchPattern);
     }
 

@@ -117,7 +117,7 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
 
     if (search) {
       const searchPattern = `%${String(search).trim()}%`;
-      sql += ` AND (reg_id LIKE ? OR full_name LIKE ? OR mobile_number LIKE ? OR place_city LIKE ? OR email LIKE ?)`;
+      sql += ` AND (reg_id ILIKE ? OR full_name ILIKE ? OR mobile_number ILIKE ? OR place_city ILIKE ? OR email ILIKE ?)`;
       params.push(searchPattern, searchPattern, searchPattern, searchPattern, searchPattern);
     }
 
@@ -127,7 +127,7 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
     }
 
     if (place) {
-      sql += ` AND place_city LIKE ?`;
+      sql += ` AND place_city ILIKE ?`;
       params.push(`%${place}%`);
     }
 
