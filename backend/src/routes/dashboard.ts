@@ -1,7 +1,7 @@
 import { Router, Response } from 'express';
 import { query, queryOne } from '../db';
 import { authenticateToken, AuthenticatedRequest } from '../middleware/auth';
-import { getISTDateString } from '../utils/datetime';
+import { getISTDateString, isISTSunday } from '../utils/datetime';
 import { Member, Visitor } from '../types';
 
 const router = Router();
@@ -29,9 +29,8 @@ function getMostRecentSundayDate(dateStr: string): string {
 router.get('/stats', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const todayDate = getISTDateString(); // YYYY-MM-DD (IST)
-    const [y, m, d] = todayDate.split('-').map(Number);
-    const todayObj = new Date(y, m - 1, d);
-    const isTodaySunday = todayObj.getDay() === 0;
+    const isTodaySunday = isISTSunday();
+
 
     // Determine active service date for dashboard display:
     // If today is Sunday -> use todayDate

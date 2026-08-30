@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
-import { QrCode, CheckCircle2, AlertTriangle, UserCheck, RefreshCw, Volume2, Search, ArrowRight } from 'lucide-react';
+import { QrCode, CheckCircle2, AlertTriangle, UserCheck, RefreshCw, Volume2, Search, ArrowRight, CalendarX, Calendar } from 'lucide-react';
 import { apiRequest } from '../../utils/api';
 import { Member, AttendanceRecord } from '../../types';
 import { emitDataEvent } from '../../utils/dataEvents';
+import { isISTSunday, getISTDayName, getISTDateString } from '../../utils/datetime';
 
 interface SundayQRScannerProps {
   onCheckInSuccess?: () => void;
@@ -13,13 +14,16 @@ export const SundayQRScanner: React.FC<SundayQRScannerProps> = () => {
   const [manualCode, setManualCode] = useState('');
   const [processing, setProcessing] = useState(false);
   const [scanResult, setScanResult] = useState<{
-    status: 'success' | 'already_checked_in' | 'error';
+    status: 'success' | 'already_checked_in' | 'not_sunday' | 'error';
     message: string;
     member?: Member;
     attendance?: AttendanceRecord;
   } | null>(null);
 
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+  const isSundayToday = isISTSunday();
+  const currentDay = getISTDayName();
+  const currentDate = getISTDateString();
 
   // Play audio check-in sound
   const playAudioChime = (type: 'success' | 'warning') => {
@@ -58,6 +62,7 @@ export const SundayQRScanner: React.FC<SundayQRScannerProps> = () => {
       const res = await apiRequest<{
         success: boolean;
         message: string;
+        notSunday?: boolean;
         alreadyCheckedIn?: boolean;
         member?: Member;
         attendance?: AttendanceRecord;
@@ -72,6 +77,13 @@ export const SundayQRScanner: React.FC<SundayQRScannerProps> = () => {
           attendance: res.attendance
         });
         emitDataEvent('attendance:changed');
+      } else if (res.notSunday) {
+        playAudioChime('warning');
+        setScanResult({
+          status: 'not_sunday',
+          message: res.message,
+          member: res.member
+        });
       } else if (res.alreadyCheckedIn && res.member) {
         playAudioChime('warning');
         setScanResult({
@@ -96,6 +108,7 @@ export const SundayQRScanner: React.FC<SundayQRScannerProps> = () => {
       setProcessing(false);
     }
   };
+
 
   useEffect(() => {
     // Initialize HTML5 QR Scanner
@@ -136,29 +149,59 @@ export const SundayQRScanner: React.FC<SundayQRScannerProps> = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
+    <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
       
-      {/* Title */}
-      <div className="text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-100 text-amber-900 font-bold text-xs mb-3 border border-amber-300">
-          <QrCode className="w-4 h-4 text-amber-700" />
-          <span>Sunday Attendance Live Camera Scanner</span>
+      {/* Top Banner with Day Verification */}
+      <div className="text-center space-y-3">
+        <div>
+          {isSundayToday ? (
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-900 font-bold text-xs border border-emerald-300 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Sunday Service Active — Ready for Live Member Check-ins</span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-100 text-amber-900 font-bold text-xs border border-amber-300 shadow-sm">
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-700" />
+              <span>Sunday Only Policy Active — Today is {currentDay} ({currentDate})</span>
+            </div>
+          )}
         </div>
+
         <h2 className="text-3xl font-extrabold text-slate-900">
-          Scan Sunday Service Member QR Code
+          Sunday Service Member Attendance Scanner
         </h2>
-        <p className="text-sm text-slate-600 mt-2">
-          Position member QR badge in front of the device camera for instant check-in.
+        <p className="text-sm text-slate-600 max-w-xl mx-auto">
+          Position member QR badge in front of the device camera for instant check-in. Check-ins are restricted to Sunday service dates.
         </p>
+
+        {/* Non-Sunday Warning Notification */}
+        {!isSundayToday && (
+          <div className="p-4 rounded-2xl bg-amber-50/90 border border-amber-200 text-amber-900 text-xs flex items-start gap-3 max-w-2xl mx-auto text-left shadow-sm">
+            <CalendarX className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-bold text-amber-950">Sunday Attendance Restriction Active</p>
+              <p className="text-amber-800 mt-0.5 leading-relaxed">
+                Attendance check-in is restricted strictly to Sundays. Today is <strong>{currentDay}</strong>. The system will verify member QR codes, but <strong>no attendance record will be marked</strong> until Sunday service.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
         
         {/* Left Column: Live Camera Scanner */}
         <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-card-elevate">
-          <h3 className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-            <Volume2 className="w-4 h-4 text-amber-500" />
-            <span>Camera QR Scanner</span>
+          <h3 className="text-base font-bold text-slate-900 mb-4 flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <Volume2 className="w-4 h-4 text-amber-500" />
+              <span>Camera QR Scanner</span>
+            </span>
+            <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
+              isSundayToday ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+            }`}>
+              {isSundayToday ? 'Live Scanning' : 'Sunday Only'}
+            </span>
           </h3>
 
           <div className="overflow-hidden rounded-2xl border-2 border-slate-100 bg-slate-950 min-h-[300px] flex items-center justify-center">
@@ -211,6 +254,19 @@ export const SundayQRScanner: React.FC<SundayQRScannerProps> = () => {
                 </div>
               )}
 
+              {scanResult.status === 'not_sunday' && (
+                <div className="p-6 rounded-2xl bg-amber-50 border-2 border-amber-400 text-center space-y-3">
+                  <div className="w-14 h-14 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center mx-auto shadow-lg">
+                    <CalendarX className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-xl font-black text-amber-950">Sunday Attendance Only</h3>
+                  <p className="text-xs text-amber-900 font-semibold leading-relaxed">{scanResult.message}</p>
+                  <div className="inline-block px-3 py-1 rounded-full bg-amber-200/80 text-amber-950 font-bold text-[11px]">
+                    Check-in Locked (Non-Sunday)
+                  </div>
+                </div>
+              )}
+
               {scanResult.status === 'already_checked_in' && (
                 <div className="p-6 rounded-2xl bg-amber-50 border-2 border-amber-400 text-center space-y-3">
                   <div className="w-14 h-14 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center mx-auto shadow-lg">
@@ -244,22 +300,27 @@ export const SundayQRScanner: React.FC<SundayQRScannerProps> = () => {
                   <div>
                     <h4 className="text-lg font-bold text-white">{scanResult.member.full_name}</h4>
                     <p className="text-xs text-slate-400 mt-0.5">
-                      Phone: <span className="text-slate-200">{scanResult.member.mobile_number}</span> | City: <span className="text-slate-200">{scanResult.member.place_city}</span>
+                      Phone: <span className="text-slate-200">{scanResult.member.mobile_number}</span> {scanResult.member.place_city && <>| City: <span className="text-slate-200">{scanResult.member.place_city}</span></>}
                     </p>
                   </div>
 
-                  {scanResult.attendance && (
-                    <div className="pt-2 text-xs text-emerald-400 flex items-center justify-between font-semibold">
+                  {scanResult.attendance ? (
+                    <div className="pt-2 text-xs text-emerald-400 flex items-center justify-between font-semibold border-t border-slate-800">
                       <span>Service Date: {scanResult.attendance.service_date}</span>
                       <span>Check-in Time: {scanResult.attendance.check_in_time}</span>
                     </div>
-                  )}
+                  ) : scanResult.status === 'not_sunday' ? (
+                    <div className="pt-2 text-xs text-amber-400 flex items-center justify-between font-semibold border-t border-slate-800">
+                      <span>Today: {currentDay} ({currentDate})</span>
+                      <span className="text-amber-300">Check-in not saved</span>
+                    </div>
+                  ) : null}
                 </div>
               )}
 
               <button
                 onClick={() => setScanResult(null)}
-                className="w-full py-3 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-xs text-slate-800 transition-colors"
+                className="w-full py-3 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-xs text-slate-800 transition-colors cursor-pointer"
               >
                 Scan Next Member
               </button>
@@ -279,3 +340,4 @@ export const SundayQRScanner: React.FC<SundayQRScannerProps> = () => {
     </div>
   );
 };
+

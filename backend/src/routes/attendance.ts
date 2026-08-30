@@ -2,7 +2,7 @@ import { Router, Response } from 'express';
 import { query, queryOne, execute } from '../db';
 import { authenticateToken, AuthenticatedRequest } from '../middleware/auth';
 import { AttendanceRecord, Member } from '../types';
-import { getISTDateString, getISTTimeString, getISTDateTimeString } from '../utils/datetime';
+import { isISTSunday, getISTDayName, getISTDateString, getISTTimeString, getISTDateTimeString } from '../utils/datetime';
 
 const router = Router();
 
@@ -30,8 +30,23 @@ router.post('/scan', authenticateToken, async (req: AuthenticatedRequest, res: R
       });
     }
 
-    // 2. Check if already checked in today (IST date)
+    // 2. Enforce Sunday-Only Attendance Policy
+    const isSunday = isISTSunday();
+    const currentDayName = getISTDayName();
     const todayDate = getISTDateString(); // YYYY-MM-DD
+
+    if (!isSunday) {
+      return res.status(200).json({
+        success: false,
+        notSunday: true,
+        dayName: currentDayName,
+        serviceDate: todayDate,
+        member,
+        message: `Attendance check-in is restricted to Sundays only. Today is ${currentDayName} (${todayDate}). Attendance check-in was not recorded.`
+      });
+    }
+
+    // 3. Check if already checked in today (IST date)
     const existingAttendance = await queryOne<AttendanceRecord>(
       `SELECT * FROM attendance WHERE member_id = ? AND service_date = ?`,
       [member.id, todayDate]
@@ -47,7 +62,7 @@ router.post('/scan', authenticateToken, async (req: AuthenticatedRequest, res: R
       });
     }
 
-    // 3. Mark Attendance Present
+    // 4. Mark Attendance Present
     const checkInTime = getISTTimeString(); // e.g. "09:45:12 AM"
     const now = getISTDateTimeString();
     const adminName = req.user?.full_name || 'Admin Scanner';
@@ -66,6 +81,7 @@ router.post('/scan', authenticateToken, async (req: AuthenticatedRequest, res: R
       member,
       attendance: newAttendance
     });
+
   } catch (error: any) {
     console.error('Attendance scan error:', error);
     return res.status(500).json({ success: false, message: 'Failed to record attendance.' });

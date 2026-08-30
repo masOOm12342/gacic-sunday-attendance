@@ -32,10 +32,12 @@ A high-performance web and mobile application engineered for **Glorious Apostoli
 
 ### 4. Sunday Service Camera Scanner & Attendance Tracking
 - **Live Camera Scanner**: Fast, continuous QR code scanning utilizing device webcams and mobile cameras (`html5-qrcode`).
+- **Strict Sunday-Only Attendance Policy**: Uses calendar date and IST day verification (`Asia/Kolkata`) to enforce that attendance check-in can only be recorded on Sundays. Scans on non-Sunday days verify member details but lock check-in recording.
 - **Audio & Visual Feedback**: Instant chime sound and interactive confetti celebration on successful attendance check-in.
 - **Same-Day Duplicate Prevention**: Prevents accidental double check-ins on the same Sunday service date with friendly warning notifications displaying previous check-in time.
 - **Manual Check-In Fallback**: Fast manual lookup and check-in option by Registration ID or Mobile Number for devices without cameras.
 - **Attendance History & Logs**: Detailed attendance tracking with exact check-in timestamps, service dates, and scanner attribution.
+
 
 ### 5. Role-Based Access Control & Admin Governance
 - **Role Hierarchy**: Structured access levels (`SUPER_ADMIN` and `ADMIN`).

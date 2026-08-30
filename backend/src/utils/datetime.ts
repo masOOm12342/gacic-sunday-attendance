@@ -4,28 +4,44 @@
  */
 
 export function getISTNow(): Date {
-  const now = new Date();
-  // IST offset in minutes is +330 (+5 hours 30 mins)
-  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-  return new Date(utc + (330 * 60000));
+  return new Date();
 }
 
-export function getISTDateString(date: Date = getISTNow()): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+export function isISTSunday(date: Date = new Date()): boolean {
+  const weekday = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Kolkata',
+    weekday: 'long'
+  }).format(date);
+  return weekday.toLowerCase() === 'sunday';
 }
 
-export function getISTTimeString(date: Date = getISTNow()): string {
-  return date.toLocaleTimeString('en-IN', {
+export function getISTDayName(date: Date = new Date()): string {
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Kolkata',
+    weekday: 'long'
+  }).format(date);
+}
+
+export function getISTDateString(date: Date = new Date()): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(date);
+}
+
+export function getISTTimeString(date: Date = new Date()): string {
+  return new Intl.DateTimeFormat('en-IN', {
+    timeZone: 'Asia/Kolkata',
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
     hour12: true
-  });
+  }).format(date);
 }
 
-export function getISTDateTimeString(date: Date = getISTNow()): string {
+export function getISTDateTimeString(date: Date = new Date()): string {
   return `${getISTDateString(date)} ${getISTTimeString(date)}`;
 }
+
