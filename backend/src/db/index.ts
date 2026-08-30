@@ -216,8 +216,32 @@ export async function initDatabase() {
     await execute(`ALTER TABLE visitors ALTER COLUMN place_city DROP NOT NULL;`);
   } catch (e) {}
 
+  // 7. One-time clean of seed members in Neon DB (preserves future manual entries)
+  try {
+    const cleanedFlag = await queryOne<{ key_value: string }>(
+      `SELECT key_value FROM system_settings WHERE key_name = 'seed_members_purged_v1'`
+    );
+
+    if (!cleanedFlag) {
+      console.log('[DB Clean] Purging seed members and attendance from Neon DB for manual entry...');
+      await execute(`DELETE FROM attendance;`);
+      await execute(`DELETE FROM members;`);
+      try {
+        await execute(`SELECT setval(pg_get_serial_sequence('members', 'id'), 1, false);`);
+      } catch (seqErr) {}
+      await execute(
+        `INSERT INTO system_settings (key_name, key_value, updated_at) VALUES (?, ?, ?) ON CONFLICT (key_name) DO UPDATE SET key_value = EXCLUDED.key_value`,
+        ['seed_members_purged_v1', 'true', getISTDateTimeString()]
+      );
+      console.log('[DB Clean] Neon DB members table is now empty and ready for manual entries.');
+    }
+  } catch (cleanErr) {
+    console.error('[DB Clean Error]', cleanErr);
+  }
+
   console.log('[DB] Neon PostgreSQL Database Initialized Successfully.');
 }
+
 
 
 /**

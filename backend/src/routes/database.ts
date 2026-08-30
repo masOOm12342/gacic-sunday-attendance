@@ -41,4 +41,29 @@ router.post('/clear-visitors', authenticateToken, requireSuperAdmin, async (req:
   }
 });
 
+// Super Admin: POST /api/database/clear-members
+router.post('/clear-members', authenticateToken, requireSuperAdmin, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    await query(`DELETE FROM attendance`);
+    await query(`DELETE FROM members`);
+    try {
+      await query(`SELECT setval(pg_get_serial_sequence('members', 'id'), 1, false)`);
+    } catch (seqErr) {}
+    return res.json({ success: true, message: 'All members and attendance records have been cleared from Neon DB.' });
+  } catch (error: any) {
+    return res.status(500).json({ success: false, message: 'Failed to clear members table.' });
+  }
+});
+
+// Super Admin: POST /api/database/clear-attendance
+router.post('/clear-attendance', authenticateToken, requireSuperAdmin, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    await query(`DELETE FROM attendance`);
+    return res.json({ success: true, message: 'Attendance records cleared successfully.' });
+  } catch (error: any) {
+    return res.status(500).json({ success: false, message: 'Failed to clear attendance table.' });
+  }
+});
+
 export default router;
+
