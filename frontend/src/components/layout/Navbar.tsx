@@ -22,20 +22,20 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           
-          {/* Top-Left Dedicated Logo Placeholder + Church Title */}
+          {/* Top-Left Dedicated Logo + Church Title */}
           <div 
             onClick={() => setActiveTab('home')}
-            className="flex items-center gap-3 cursor-pointer group"
+            className="flex items-center gap-3.5 cursor-pointer group"
           >
-            {/* Dedicated Logo Box */}
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-900 via-purple-900 to-amber-600 p-[2px] shadow-glow-gold group-hover:scale-105 transition-transform duration-300">
-              <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center relative overflow-hidden border border-amber-500/30">
+            {/* Dedicated Circular Logo Box with Gold Aura */}
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/50 via-amber-300/40 to-amber-500/50 rounded-full blur-sm opacity-75 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative w-12 h-12 rounded-full bg-slate-950 p-1 border-2 border-amber-400/90 shadow-[0_0_18px_rgba(245,158,11,0.5)] flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-300">
                 <img
                   src="/logo.png"
                   alt="GACIC Logo"
-                  className="w-full h-full object-cover rounded-[9px]"
+                  className="w-full h-full object-cover rounded-full"
                   onError={(e) => {
-                    // Fallback to icon if logo image fails to load
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
                 />
@@ -43,17 +43,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
 
             <div>
-              <div className="flex items-center gap-1.5">
-                <h1 className="text-base sm:text-lg font-bold font-sans tracking-tight text-white group-hover:text-amber-400 transition-colors">
+              <div className="flex items-center gap-2">
+                <h1 className="text-base sm:text-lg font-black font-sans tracking-tight bg-gradient-to-r from-amber-200 via-amber-400 to-amber-100 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(245,158,11,0.6)]">
                   Glorious Apostolic Church
                 </h1>
-                <span className="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-400/60 shadow-[0_0_10px_rgba(245,158,11,0.3)]">
                   India Council
                 </span>
               </div>
-              <p className="text-xs text-slate-400 font-medium flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                Sunday Attendance & QR Registration System
+              <p className="text-xs text-amber-200/90 font-medium flex items-center gap-1.5 mt-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,1)] animate-pulse"></span>
+                <span>Sunday Attendance &amp; QR Registration System</span>
               </p>
             </div>
           </div>
