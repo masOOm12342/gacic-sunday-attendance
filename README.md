@@ -32,25 +32,34 @@ A high-performance web and mobile application engineered for **Glorious Apostoli
 
 ### 4. Sunday Service Camera Scanner & Attendance Tracking
 - **Live Camera Scanner**: Fast, continuous QR code scanning utilizing device webcams and mobile cameras (`html5-qrcode`).
-- **Strict Sunday-Only Attendance Policy**: Uses calendar date and IST day verification (`Asia/Kolkata`) to enforce that attendance check-in can only be recorded on Sundays. Scans on non-Sunday days verify member details but lock check-in recording.
+- **Strict Sunday-Only Attendance Policy**: Uses calendar date and IST day verification (`Asia/Kolkata`) to enforce that attendance check-in can only be recorded on Sundays. Scans on non-Sunday days verify member details but lock check-in recording with informational prompts.
 - **Audio & Visual Feedback**: Instant chime sound and interactive confetti celebration on successful attendance check-in.
 - **Same-Day Duplicate Prevention**: Prevents accidental double check-ins on the same Sunday service date with friendly warning notifications displaying previous check-in time.
 - **Manual Check-In Fallback**: Fast manual lookup and check-in option by Registration ID or Mobile Number for devices without cameras.
 - **Attendance History & Logs**: Detailed attendance tracking with exact check-in timestamps, service dates, and scanner attribution.
 
-
 ### 5. Role-Based Access Control & Admin Governance
 - **Role Hierarchy**: Structured access levels (`SUPER_ADMIN` and `ADMIN`).
 - **Self-Service Admin Access Requests**: Prospective administrators can submit an access request and set their preferred password during application.
 - **Admin Approval Queue**: Super Admins review pending requests with one-click **Approve**, **Reject**, or **Delete** controls.
+- **Permanent Account Safeguards**: Primary Super Admin account is protected against accidental deletion or role demotion.
 - **Cryptographic Security**: Passwords hashed using `bcrypt` and authenticated via secure JSON Web Tokens (JWT).
 
-### 6. Analytics Dashboard & Real-Time Sync
+### 6. Super Admin Database Management & Maintenance
+- **Database Maintenance Console**: Direct controls within the admin interface for managing data hygiene.
+- **Selective Data Reset**: Super Admins can selectively clear member records, visitor logs, or attendance history when resetting for a new church term or testing.
+
+### 7. Modern UI/UX, Church Branding & Responsive Design
+- **Luxury Aesthetic**: Dark mode interface accented with amber/gold gradients, glassmorphic cards, and ambient lighting effects.
+- **Full Branding Suite**: Multi-resolution 1:1 circular church emblems for browser tab bar (`favicon.ico`, `favicon-32x32.png`, `apple-touch-icon.png`, `logo.png`).
+- **Rich Church Footer**: Complete with official church mission statements, Scripture, direct social media channels (YouTube, Instagram, Facebook), 4-line Prayer and Counseling helplines, and official email communication.
+
+### 8. Analytics Dashboard & Real-Time Sync
 - **Live KPI Overview**: Instant metrics for Total Registered Members, Active Members, Sunday Attendance, and Total Visitors.
 - **Cross-Tab Synchronization**: Custom event bus automatically updates open browser tabs and administrator sessions in real-time when records change.
 - **Indian Standard Time (IST - UTC+5:30)**: All logs, check-ins, reports, and time calculations are standardized to IST.
 
-### 7. Multi-Format Reporting & Data Exports
+### 9. Multi-Format Reporting & Data Exports
 - **Excel (`.xlsx`)**: Formatted multi-column spreadsheets with styled headers for Members, Visitors, and Attendance logs.
 - **Plain-Text CSV**: Data-safe CSV formatting preserving exact zero-padded numbers and preventing Excel scientific notation or date mangling.
 - **PDF Reports**: Clean, tabular PDF exports generated via `jspdf` and `jspdf-autotable`.
@@ -161,7 +170,7 @@ npm run build
 
 ## 🔒 Security & Administrative Access
 
-- Administrative accounts are managed through the **Admin Access Request** workflow or initialized via server environment configurations.
+- Administrative accounts are managed through the **Admin Access Request** workflow or initialized securely via database seeding.
 - Super Admin privileges allow reviewing, approving, and rejecting new administrator applications.
 - Passwords are encrypted with salted hashes and never stored or returned in plaintext.
 
