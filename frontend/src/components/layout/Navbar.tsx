@@ -29,8 +29,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             {/* Dedicated Circular Logo Box with Gold Aura */}
             <div className="relative">
-              <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/50 via-amber-300/40 to-amber-500/50 rounded-full blur-sm opacity-75 group-hover:opacity-100 transition-opacity"></div>
-              <div className="relative w-12 h-12 rounded-full bg-slate-950 p-1 border-2 border-amber-400/90 shadow-[0_0_18px_rgba(245,158,11,0.5)] flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-300">
+              <div className="relative w-12 h-12 rounded-full bg-slate-950 p-1 border-2 border-amber-400/80 shadow-[0_0_15px_rgba(245,158,11,0.4)] flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-300">
                 <img
                   src="/logo.png"
                   alt="GACIC Logo"
@@ -43,16 +42,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
 
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-base sm:text-lg font-black font-sans tracking-tight bg-gradient-to-r from-amber-200 via-amber-400 to-amber-100 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(245,158,11,0.6)]">
-                  Glorious Apostolic Church
-                </h1>
-                <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-400/60 shadow-[0_0_10px_rgba(245,158,11,0.3)]">
-                  India Council
-                </span>
-              </div>
-              <p className="text-xs text-amber-200/90 font-medium flex items-center gap-1.5 mt-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,1)] animate-pulse"></span>
+              <h1 className="text-base sm:text-lg font-bold font-sans tracking-tight text-white group-hover:text-amber-400 transition-colors">
+                Glorious Apostolic Church India Council
+              </h1>
+              <p className="text-xs text-slate-400 font-medium flex items-center gap-1.5 mt-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                 <span>Sunday Attendance &amp; QR Registration System</span>
               </p>
             </div>

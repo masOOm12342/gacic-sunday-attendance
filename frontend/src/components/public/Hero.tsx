@@ -52,13 +52,16 @@ export const Hero: React.FC<HeroProps> = ({
         </div>
 
         {/* Hero Title */}
-        <div className="text-center max-w-5xl mx-auto space-y-3">
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight font-sans leading-tight">
-            <span className="block text-2xl sm:text-4xl lg:text-5xl font-black bg-gradient-to-r from-amber-300 via-amber-100 to-amber-400 bg-clip-text text-transparent drop-shadow-[0_0_25px_rgba(245,158,11,0.45)] mb-2 sm:mb-3">
+        <div className="text-center max-w-5xl mx-auto space-y-4">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight font-sans text-white leading-tight">
+            <span className="block text-2xl sm:text-4xl lg:text-5xl font-black text-white drop-shadow-md mb-2 sm:mb-3">
               Glorious Apostolic Church India Council
             </span>
-            <span className="block text-2xl sm:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-amber-400 via-amber-200 to-amber-500 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(245,158,11,0.5)]">
-              QR Code Registration &amp; Sunday Attendance
+            <span className="block text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white">
+              <span className="bg-gradient-to-r from-amber-400 via-amber-200 to-amber-500 bg-clip-text text-transparent drop-shadow-[0_0_25px_rgba(245,158,11,0.3)]">
+                QR Code
+              </span>{' '}
+              Registration &amp; Sunday Attendance
             </span>
           </h1>
 
