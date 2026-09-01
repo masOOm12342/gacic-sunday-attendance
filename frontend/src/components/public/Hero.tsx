@@ -37,17 +37,17 @@ export const Hero: React.FC<HeroProps> = ({
             </div>
           </div>
 
-          {/* Prominent & Premium "WELCOME TO" Banner */}
-          <div className="flex items-center gap-3 sm:gap-4 my-2">
-            <div className="h-[2px] w-12 sm:w-20 bg-gradient-to-r from-transparent via-amber-400/60 to-amber-400" />
-            <div className="flex items-center gap-2 px-5 py-1.5 rounded-full bg-amber-500/10 border border-amber-400/40 backdrop-blur-md shadow-[0_0_20px_rgba(245,158,11,0.25)]">
-              <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
-              <span className="text-base sm:text-xl md:text-2xl font-black tracking-[0.25em] sm:tracking-[0.35em] uppercase text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-100 drop-shadow-[0_0_12px_rgba(245,158,11,0.6)]">
+          {/* Prominent & Premium "WELCOME TO" Banner (Exact Golden Capsule Style) */}
+          <div className="flex items-center justify-center gap-3 sm:gap-5 my-3 w-full max-w-2xl px-4">
+            <div className="h-[1.5px] flex-1 bg-gradient-to-r from-transparent via-amber-400/60 to-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+            <div className="flex items-center gap-3 px-6 sm:px-8 py-2 sm:py-2.5 rounded-full bg-[#0a101d]/90 border border-amber-400/80 shadow-[0_0_30px_rgba(245,158,11,0.35)] backdrop-blur-md">
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 animate-pulse" />
+              <span className="text-sm sm:text-lg md:text-xl font-black tracking-[0.25em] sm:tracking-[0.35em] uppercase text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-100 drop-shadow-[0_0_12px_rgba(245,158,11,0.7)]">
                 WELCOME TO
               </span>
-              <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 animate-pulse" />
             </div>
-            <div className="h-[2px] w-12 sm:w-20 bg-gradient-to-l from-transparent via-amber-400/60 to-amber-400" />
+            <div className="h-[1.5px] flex-1 bg-gradient-to-l from-transparent via-amber-400/60 to-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
           </div>
         </div>
 
