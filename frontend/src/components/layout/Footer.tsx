@@ -4,27 +4,27 @@ export const Footer: React.FC = () => {
   return (
     <footer className="bg-[#070E1A] text-slate-300 pt-12 pb-8 border-t border-amber-500/20 relative overflow-hidden font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Main 3-Column Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 pb-10">
-          
+
           {/* Column 1: Church Identity & Vision (5 cols) */}
           <div className="lg:col-span-5 space-y-4">
-            
+
             {/* Header: Golden Logo & Title */}
             <div className="flex items-center gap-3.5">
               {/* Golden Bible with Cross Emblem SVG */}
               <div className="w-12 h-12 flex-shrink-0 text-amber-400 flex items-center justify-center">
                 <svg viewBox="0 0 64 64" fill="none" className="w-full h-full drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]">
                   {/* Radiant Rays */}
-                  <path d="M32 4V10M32 54V60M10 32H4M60 32H54M16 16L20 20M44 44L48 48M16 48L20 44M44 20L48 16" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" opacity="0.6"/>
+                  <path d="M32 4V10M32 54V60M10 32H4M60 32H54M16 16L20 20M44 44L48 48M16 48L20 44M44 20L48 16" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
                   {/* Open Bible */}
-                  <path d="M12 44C18 42 26 42 32 46C38 42 46 42 52 44V26C46 24 38 24 32 28C26 24 18 24 12 26V44Z" fill="#0A192F" stroke="#F59E0B" strokeWidth="2.5" strokeLinejoin="round"/>
-                  <path d="M32 28V46" stroke="#F59E0B" strokeWidth="2.5"/>
+                  <path d="M12 44C18 42 26 42 32 46C38 42 46 42 52 44V26C46 24 38 24 32 28C26 24 18 24 12 26V44Z" fill="#0A192F" stroke="#F59E0B" strokeWidth="2.5" strokeLinejoin="round" />
+                  <path d="M32 28V46" stroke="#F59E0B" strokeWidth="2.5" />
                   {/* Bible Page Base */}
-                  <path d="M12 47C18 45 26 45 32 49C38 45 46 45 52 47" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M12 47C18 45 26 45 32 49C38 45 46 45 52 47" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" />
                   {/* Golden Latin Cross */}
-                  <path d="M32 12V34M25 18H39" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round"/>
+                  <path d="M32 12V34M25 18H39" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round" />
                 </svg>
               </div>
 
@@ -75,10 +75,10 @@ export const Footer: React.FC = () => {
             </div>
 
             <div className="space-y-3">
-              
+
               {/* YouTube Link Pill */}
               <a
-                href="https://youtube.com/@GloriousTruthTimeTV"
+                href="https://www.youtube.com/@prophetdranish"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-red-500/50 hover:bg-slate-900 transition-all duration-200 shadow-sm block"
@@ -86,21 +86,21 @@ export const Footer: React.FC = () => {
                 {/* YouTube Icon */}
                 <div className="w-6 h-6 rounded-md bg-[#FF0000] flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
                   <svg viewBox="0 0 24 24" fill="white" className="w-3.5 h-3.5">
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.5 12 3.5 12 3.5s-7.505 0-9.377.55a3.016 3.016 0 0 0-2.122 2.136C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.55 9.376.55 9.376.55s7.505 0 9.377-.55a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.5 12 3.5 12 3.5s-7.505 0-9.377.55a3.016 3.016 0 0 0-2.122 2.136C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.55 9.376.55 9.376.55s7.505 0 9.377-.55a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
                   </svg>
                 </div>
                 <div className="text-xs truncate">
                   <strong className="text-white font-bold">YouTube</strong>
                   <span className="text-slate-500 mx-1.5 font-light">|</span>
                   <span className="text-slate-300 font-medium group-hover:text-amber-400 transition-colors">
-                    youtube.com/@GloriousTruthTimeTV
+                    youtube.com/@prophetdranish
                   </span>
                 </div>
               </a>
 
               {/* Instagram Link Pill */}
               <a
-                href="https://instagram.com/glorious_truth_time_tv"
+                href="https://www.instagram.com/prophet_dr_anish_/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-pink-500/50 hover:bg-slate-900 transition-all duration-200 shadow-sm block"
@@ -108,23 +108,23 @@ export const Footer: React.FC = () => {
                 {/* Instagram Icon */}
                 <div className="w-6 h-6 rounded-md bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#8134AF] flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
                   <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
                   </svg>
                 </div>
                 <div className="text-xs truncate">
                   <strong className="text-white font-bold">Instagram</strong>
                   <span className="text-slate-500 mx-1.5 font-light">|</span>
                   <span className="text-slate-300 font-medium group-hover:text-amber-400 transition-colors">
-                    instagram.com/glorious_truth_time_tv
+                    instagram.com/prophet_dr_anish_
                   </span>
                 </div>
               </a>
 
               {/* Facebook Link Pill */}
               <a
-                href="https://facebook.com/GloriousTruthTimeTV"
+                href="https://www.facebook.com/ProphetDr.Anish"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900 transition-all duration-200 shadow-sm block"
@@ -132,14 +132,14 @@ export const Footer: React.FC = () => {
                 {/* Facebook Icon */}
                 <div className="w-6 h-6 rounded-md bg-[#1877F2] flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
                   <svg viewBox="0 0 24 24" fill="white" className="w-3.5 h-3.5">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                   </svg>
                 </div>
                 <div className="text-xs truncate">
                   <strong className="text-white font-bold">Facebook</strong>
                   <span className="text-slate-500 mx-1.5 font-light">|</span>
                   <span className="text-slate-300 font-medium group-hover:text-amber-400 transition-colors">
-                    facebook.com/GloriousTruthTimeTV
+                    facebook.com/ProphetDr.Anish
                   </span>
                 </div>
               </a>
@@ -161,10 +161,10 @@ export const Footer: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6 items-start">
-              
+
               {/* Left Sub-column: Prayer & Contact Numbers */}
               <div className="space-y-4">
-                
+
                 {/* Prayer and Counseling */}
                 <div className="flex items-center gap-2.5">
                   <div className="w-7 h-7 flex-shrink-0 text-amber-400 flex items-center justify-center">

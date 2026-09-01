@@ -21,20 +21,23 @@ export const Hero: React.FC<HeroProps> = ({
         
         {/* Header Badge */}
         <div className="flex justify-center mb-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900/80 border border-amber-500/30 text-amber-300 text-xs sm:text-sm font-semibold backdrop-blur-md shadow-glow-gold">
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-slate-900/90 border border-amber-500/30 text-amber-300 text-xs sm:text-sm font-extrabold tracking-widest uppercase backdrop-blur-md shadow-glow-gold">
             <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
-            <span>Glorious Apostolic Church India Council</span>
-            <span className="hidden sm:inline text-slate-500">|</span>
-            <span className="hidden sm:inline text-amber-400 font-bold">Sunday Attendance System</span>
+            <span>WELCOME TO</span>
           </div>
         </div>
 
         {/* Hero Title */}
-        <div className="text-center max-w-4xl mx-auto">
+        <div className="text-center max-w-5xl mx-auto">
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight font-sans text-white leading-tight">
-            Seamless <span className="bg-gradient-to-r from-amber-400 via-amber-200 to-amber-500 bg-clip-text text-transparent">QR Code</span> Registration &amp; Sunday Attendance
+            <span className="block text-2xl sm:text-4xl lg:text-5xl font-black text-white mb-2 sm:mb-3">
+              Glorious Apostolic Church India Council
+            </span>
+            <span className="block text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white">
+              <span className="bg-gradient-to-r from-amber-400 via-amber-200 to-amber-500 bg-clip-text text-transparent">QR Code</span> Registration &amp; Sunday Attendance
+            </span>
           </h1>
-          <p className="mt-6 text-base sm:text-xl text-slate-300 font-normal leading-relaxed max-w-2xl mx-auto">
+          <p className="mt-6 text-base sm:text-lg text-slate-300 font-normal leading-relaxed max-w-2xl mx-auto">
             Welcome church members and guests! Register once to receive your digital QR Badge (`REG-{new Date().getFullYear()}-XXXXX`). Scan every Sunday for instant check-in.
           </p>
         </div>
