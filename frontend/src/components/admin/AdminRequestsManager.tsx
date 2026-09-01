@@ -189,7 +189,7 @@ export const AdminRequestsManager: React.FC = () => {
                     </span>
                   </td>
                   <td className="py-3.5 px-4 text-right">
-                    {a.email.toLowerCase() !== 'gacic_admin@gmail.com' ? (
+                    {a.role !== 'SUPER_ADMIN' && a.email.toLowerCase() !== 'gloriousapostolicchurch777@gmail.com' ? (
                       <button
                         onClick={() => handleDeleteAdminUser(a.id)}
                         className="p-1.5 rounded bg-rose-50 hover:bg-rose-100 text-rose-600"

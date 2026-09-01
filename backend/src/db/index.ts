@@ -182,8 +182,16 @@ export async function initDatabase() {
     ['organization_name', 'Glorious Apostolic Church India Council', getISTDateTimeString()]
   );
 
-  // Seed Default Permanent Super Admin: gacic_admin@gmail.com / glorious@340
-  const superAdminEmail = 'gacic_admin@gmail.com';
+  // Seed Default Permanent Super Admin: gloriousapostolicchurch777@gmail.com / glorious@340
+  const superAdminEmail = 'gloriousapostolicchurch777@gmail.com';
+
+  try {
+    await execute(
+      `UPDATE admins SET email = ?, role = 'SUPER_ADMIN', status = 'ACTIVE' WHERE LOWER(email) = 'gacic_admin@gmail.com'`,
+      [superAdminEmail]
+    );
+  } catch (migErr) {}
+
   const existingSuperAdmin = await queryOne(`SELECT * FROM admins WHERE LOWER(email) = LOWER(?)`, [superAdminEmail]);
 
   const defaultPasswordHash = bcrypt.hashSync('glorious@340', 10);
@@ -207,6 +215,7 @@ export async function initDatabase() {
       [defaultPasswordHash, superAdminEmail]
     );
   }
+
 
   // 6. Make place_city optional in members and visitors tables
   try {

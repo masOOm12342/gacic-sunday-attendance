@@ -113,7 +113,7 @@ router.delete('/admin-user/:id', authenticateToken, requireSuperAdmin, async (re
       return res.status(404).json({ success: false, message: 'Admin account not found.' });
     }
 
-    if (adminUser.email.toLowerCase() === 'gacic_admin@gmail.com') {
+    if (adminUser.role === 'SUPER_ADMIN' || adminUser.email.toLowerCase() === 'gloriousapostolicchurch777@gmail.com' || adminUser.email.toLowerCase() === 'gacic_admin@gmail.com') {
       return res.status(403).json({ success: false, message: 'The primary permanent Super Admin account cannot be deleted!' });
     }
 

@@ -219,7 +219,7 @@ export const AdminRequestModal: React.FC<AdminRequestModalProps> = ({ onClose })
               </div>
 
               <p className="text-[11px] text-amber-400/80">
-                * All admin requests remain in PENDING state until explicitly approved by the Super Admin (<strong className="text-white">gacic_admin@gmail.com</strong>).
+                * All admin requests remain in PENDING state until explicitly approved by the Super Admin (<strong className="text-white">gloriousapostolicchurch777@gmail.com</strong>).
               </p>
 
               <button

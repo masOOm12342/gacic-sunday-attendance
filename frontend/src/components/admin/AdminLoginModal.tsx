@@ -14,7 +14,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
   onLoginSuccess,
   onRequestAccessClick,
 }) => {
-  const [email, setEmail] = useState('gacic_admin@gmail.com');
+  const [email, setEmail] = useState('gloriousapostolicchurch777@gmail.com');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -122,7 +122,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
 
             {/* Default Super Admin Hint */}
             <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] text-amber-300/80 flex items-center justify-between">
-              <span>Super Admin Email: <strong className="text-white">gacic_admin@gmail.com</strong></span>
+              <span>Super Admin Email: <strong className="text-white">gloriousapostolicchurch777@gmail.com</strong></span>
             </div>
 
             <button

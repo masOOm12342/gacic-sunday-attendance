@@ -69,7 +69,7 @@ initDatabase().then(() => {
     console.log(` Glorious Apostolic Church India Council - Backend Server Running`);
     console.log(` Environment: Production Ready | Timezone: IST (UTC+5:30)`);
     console.log(` Server URL:  http://localhost:${PORT}`);
-    console.log(` Super Admin Email: gacic_admin@gmail.com`);
+    console.log(` Super Admin Email: gloriousapostolicchurch777@gmail.com`);
     console.log(`===================================================================`);
   });
 }).catch(err => {
